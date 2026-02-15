@@ -189,10 +189,14 @@ function TerminalWindow({
 }
 
 export default function Portfolio() {
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+
   const [activeProject, setActiveProject] = useState<null | {
     name: string;
     description: string;
     stack: string;
+    images: string[];
+
   }>(null);
   const [openWindows, setOpenWindows] = useState({
     workspace: true,
@@ -206,6 +210,9 @@ export default function Portfolio() {
     80,
   );
   const [mounted, setMounted] = useState(false);
+useEffect(() => {
+  setCurrentImageIndex(0);
+}, [activeProject]);
 
   useEffect(() => {
     setMounted(true);
@@ -218,6 +225,10 @@ export default function Portfolio() {
         "Reading analytics platform that visualizes your book data in interactive graphs. Uses NetworkX to generate relationship graphs and suggest new books based on your own reading patterns.",
       stack: "Django + React",
       link: "#",
+        images: [
+      "/screenshots/booktomo-1.png",
+      "/screenshots/booktomo-2.png",
+    ],
     },
     {
       title: "Pookiebase",
@@ -225,6 +236,10 @@ export default function Portfolio() {
         "Mobile-first book collection manager with ISBN scanner. Pulls metadata from Google Books API to generate previews before adding to collection or wishlist.",
       stack: "Flask",
       link: "#",
+        images: [
+      "/screenshots/pookiebase-1.jpeg",
+      "/screenshots/pookiebase-2.jpeg",
+    ],
     },
     {
       title: "Spacewise",
@@ -232,6 +247,10 @@ export default function Portfolio() {
         "Property intelligence platform focused on spatial data and smart filtering. Integrates geolocation APIs and structured property datasets to surface meaningful real-estate insights.",
       stack: "Django",
       link: "#",
+        images: [
+      "/screenshots/spacewise-1.png",
+      "/screenshots/spacewise-2.png",
+    ],
     },
     {
       title: "This Portfolio",
@@ -239,6 +258,10 @@ export default function Portfolio() {
         "Cyberpunk terminal-style portfolio with draggable glass windows, custom matrix rain canvas, and a Three.js shaded coffee cup.",
       stack: "Next.js + Tailwind + Three.js",
       link: "#",
+        images: [
+      "/screenshots/portfolio-1.png",
+      "/screenshots/portfolio-2.png",
+    ],
     },
   ];
 
@@ -320,6 +343,8 @@ export default function Portfolio() {
                       name: project.title,
                       description: project.description,
                       stack: project.stack,
+                      images: project.images,
+
                     })
                   }>
                   drwxr-xr-x {project.title.toLowerCase().replace(/\s/g, "-")}
@@ -386,17 +411,59 @@ export default function Portfolio() {
           zIndex={100}
           width={800}
           onClose={() => setActiveProject(null)}>
-          <div className="space-y-4">
-            <h2 className="text-xl text-violet-400 font-bold">
-              {activeProject.name}
-            </h2>
+<div className="space-y-6">
 
-            <p className="text-zinc-400 text-sm">{activeProject.description}</p>
+  <h2 className="text-xl text-violet-400 font-bold">
+    {activeProject.name}
+  </h2>
 
-            <div className="text-xs text-pink-400 font-mono">
-              stack: {activeProject.stack}
-            </div>
-          </div>
+  {/* Screenshot Carousel */}
+  <p className="text-zinc-400 text-sm">
+    {activeProject.description}
+  </p>
+
+  <div className="text-xs text-pink-400 font-mono">
+    stack: {activeProject.stack}
+  </div>
+
+  {activeProject.images?.length > 0 && (
+    <div className="relative">
+
+<img
+  src={activeProject.images[currentImageIndex]}
+  alt="Project screenshot"
+  className="w-full max-h-[400px] object-contain rounded-lg border border-violet-500/20"
+/>
+
+
+      {/* Left Arrow */}
+      {currentImageIndex > 0 && (
+        <button
+          onClick={() =>
+            setCurrentImageIndex((prev) => prev - 1)
+          }
+          className="absolute left-2 top-1/2 -translate-y-1/2 text-violet-400 hover:text-white"
+        >
+          ◀
+        </button>
+      )}
+
+      {/* Right Arrow */}
+      {currentImageIndex < activeProject.images.length - 1 && (
+        <button
+          onClick={() =>
+            setCurrentImageIndex((prev) => prev + 1)
+          }
+          className="absolute right-2 top-1/2 -translate-y-1/2 text-violet-400 hover:text-white"
+        >
+          ▶
+        </button>
+      )}
+
+    </div>
+  )}
+</div>
+
         </TerminalWindow>
       )}
 
