@@ -6,6 +6,13 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
 import SpinningCup from "./SpinningCup";
+import dynamic from "next/dynamic";
+
+const GitHubCalendar = dynamic(
+  () => import("react-github-calendar").then(mod => mod.GitHubCalendar),
+  { ssr: false }
+);
+
 
 // Matrix Rain Background Component
 function MatrixRain() {
@@ -204,7 +211,7 @@ function CustomCursor() {
   return (
     <div
       ref={cursorRef}
-      className="fixed top-0 left-0 w-3 h-3 bg-pink-400 rounded-full pointer-events-none z-50 -translate-x-1/2 -translate-y-1/2"
+      className="fixed top-0 left-0 w-3 h-3 better-pink-bg rounded-full pointer-events-none z-[9999] -translate-x-1/2 -translate-y-1/2"
     />
   );
 }
@@ -260,7 +267,7 @@ export default function Portfolio() {
         <div className="max-w-6xl mx-auto px-4 sm:px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <span className="text-pink-400 font-bold text-lg crt-glow">~/portfolio</span>
+              <span className="better-pink font-bold text-lg crt-glow">~/portfolio</span>
               <span className="cursor-blink text-violet-400">_</span>
             </div>
             <div className="flex items-center gap-4 sm:gap-6">
@@ -273,7 +280,7 @@ export default function Portfolio() {
       </nav>
 
       {/* Hero Section */}
-      <section id="about" className="pt-32 pb-20 px-4 sm:px-6">
+      <section id="about" className="pt-42 pb-50 px-4 sm:px-6">
         <div className="max-w-6xl mx-auto">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             {/* Text Content */}
@@ -299,7 +306,37 @@ export default function Portfolio() {
 
               <div className="flex items-center gap-4 text-sm">
                 <span className="text-muted-foreground">{`// based in Belgium`}</span>
+                
               </div>
+<div className="pt-8 react-github-calendar w-full max-w-xl">
+<GitHubCalendar
+  username="lindseyjorissen"
+  blockSize={12}
+  blockMargin={4}
+  fontSize={14}
+  hideColorLegend
+  theme={{
+    light: [
+      "#1a1a2e",   // empty
+      "#3b1e6d",
+      "#5b2bb5",
+      "#7a33ff",
+      "#b266ff"    // strongest
+    ],
+    dark: [
+      "#1a1a2e",
+      "#3b1e6d",
+      "#5b2bb5",
+      "#7a33ff",
+      "#b266ff"
+    ]
+  }}
+/>
+
+  </div>
+
+
+
             </div>
 
             <div className="flex justify-center items-center">
@@ -313,7 +350,7 @@ export default function Portfolio() {
       <Separator className="max-w-xl mx-auto bg-border/50" />
 
       {/* Projects Section */}
-<section id="projects" className="pt-40 pb-20 px-4 sm:px-6">
+<section id="projects" className="pt-20 pb-20 px-4 sm:px-6">
         <div className="max-w-6xl mx-auto">
           <div className="mb-12">
             <p className="text-muted-foreground text-sm mb-2">
