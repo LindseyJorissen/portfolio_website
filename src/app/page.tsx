@@ -1,10 +1,6 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Separator } from "@/components/ui/separator";
 import SpinningCup from "./SpinningCup";
 import dynamic from "next/dynamic";
 
@@ -71,7 +67,7 @@ function MatrixRain() {
   );
 }
 
-// Terminal typing effect hook
+// Terminal typing effect
 function useTypewriter(text: string, speed: number = 50) {
   const [displayedText, setDisplayedText] = useState("");
   const [isComplete, setIsComplete] = useState(false);
@@ -250,142 +246,146 @@ export default function Portfolio() {
     <div className="h-screen w-screen overflow-hidden relative bg-black">
       <MatrixRain />
       <div className="absolute inset-0">
-        {/* Workspace Window (Coffee - Back Layer) */}
+        {/* Workspace Window (Coffee)*/}
         {openWindows.workspace && (
-        <TerminalWindow
-          title="~/workspace"
-          initialX={150}
-          initialY={90}
-          zIndex={10}
-          width={1180}
-                onClose={() =>
-      setOpenWindows((prev) => ({ ...prev, workspace: false }))
-                }>
-          <div className="flex items-center justify-center h-125">
-            <SpinningCup />
-          </div>
-        </TerminalWindow>
+          <TerminalWindow
+            title="~/workspace"
+            initialX={150}
+            initialY={90}
+            zIndex={10}
+            width={1180}
+            onClose={() =>
+              setOpenWindows((prev) => ({ ...prev, workspace: false }))
+            }>
+            <div className="flex items-center justify-center h-125">
+              <SpinningCup />
+            </div>
+          </TerminalWindow>
         )}
-        {/* About Window (Front Layer) */}
+        {/* About Window */}
         {openWindows.about && (
-        <TerminalWindow
-          title="~/about"
-          initialX={230}
-          initialY={130}
-          zIndex={20}
-          width={420}
-                          onClose={() =>
-      setOpenWindows((prev) => ({ ...prev, about: false }))
-                }>
-          <p className="text-zinc-400 text-sm mb-2">
-            <span className="text-violet-400">user@dev</span>:~$ whoami
-          </p>
+          <TerminalWindow
+            title="~/about"
+            initialX={230}
+            initialY={130}
+            zIndex={20}
+            width={420}
+            onClose={() =>
+              setOpenWindows((prev) => ({ ...prev, about: false }))
+            }>
+            <p className="text-zinc-400 text-sm mb-2">
+              <span className="text-violet-400">user@dev</span>:~$ whoami
+            </p>
 
-          <h1 className="text-2xl font-bold neon-name mb-2">
-            Lindsey Jorissen
-          </h1>
+            <h1 className="text-2xl font-bold neon-name mb-2">
+              Lindsey Jorissen
+            </h1>
 
-          <div className="flex items-center gap-2 text-lg text-violet-200 mb-4">
-            <span className="text-zinc-500">&gt;</span>
-            <span>{displayedText}</span>
-            {!isComplete && (
-              <span className="cursor-blink text-violet-400">|</span>
-            )}
-          </div>
+            <div className="flex items-center gap-2 text-lg text-violet-200 mb-4">
+              <span className="text-zinc-500">&gt;</span>
+              <span>{displayedText}</span>
+              {!isComplete && (
+                <span className="cursor-blink text-violet-400">|</span>
+              )}
+            </div>
 
-          <p className="text-zinc-400 text-sm mb-4">
-            I build systems that live on the internet. Usually when I want
-            something no one has made before.
-          </p>
-        </TerminalWindow>
+            <p className="text-zinc-400 text-sm mb-4">
+              I build systems that live on the internet. Usually when I want
+              something no one has made before.
+            </p>
+          </TerminalWindow>
         )}
-        {/* Projects Window (Top Layer) */}
+        {/* Projects Window */}
         {openWindows.projects && (
-        <TerminalWindow
-          title="~/projects"
-          initialX={880}
-          initialY={190}
-          zIndex={30}
-          width={550}
-                          onClose={() =>
-      setOpenWindows((prev) => ({ ...prev, projects: false }))
-                }>
-          <p className="text-zinc-400 text-sm mb-4">
-            <span className="text-violet-400">user@dev</span>:~/projects$ ls
-          </p>
+          <TerminalWindow
+            title="~/projects"
+            initialX={880}
+            initialY={190}
+            zIndex={30}
+            width={550}
+            onClose={() =>
+              setOpenWindows((prev) => ({ ...prev, projects: false }))
+            }>
+            <p className="text-zinc-400 text-sm mb-4">
+              <span className="text-violet-400">user@dev</span>:~/projects$ ls
+            </p>
 
-          <div className="space-y-2 font-mono text-sm">
-            {projects.map((project) => (
-              <div
-                key={project.title}
-                className="text-violet-400 font-mono text-sm cursor-pointer hover:text-pink-400 transition-colors"
-                onClick={() =>
-                  setActiveProject({
-                    name: project.title,
-                    description: project.description,
-                    stack: project.stack,
-                  })
-                }>
-                drwxr-xr-x {project.title.toLowerCase().replace(/\s/g, "-")}
-              </div>
-            ))}
-          </div>
-        </TerminalWindow>
+            <div className="space-y-2 font-mono text-sm">
+              {projects.map((project) => (
+                <div
+                  key={project.title}
+                  className="text-violet-400 font-mono text-sm cursor-pointer hover:text-pink-400 transition-colors"
+                  onClick={() =>
+                    setActiveProject({
+                      name: project.title,
+                      description: project.description,
+                      stack: project.stack,
+                    })
+                  }>
+                  drwxr-xr-x {project.title.toLowerCase().replace(/\s/g, "-")}
+                </div>
+              ))}
+            </div>
+          </TerminalWindow>
         )}
         {/* System Window */}
         {openWindows.system && (
-        <TerminalWindow
-          title="~/system"
-          initialX={50}
-          initialY={480}
-          zIndex={25}
-          width={650}
-                          onClose={() =>
-      setOpenWindows((prev) => ({ ...prev, system: false }))
-}>
-          <p className="text-zinc-400 text-sm mb-4">
-            <span className="text-violet-400">user@dev</span>:~$ system-status
-          </p>
+          <TerminalWindow
+            title="~/system"
+            initialX={50}
+            initialY={480}
+            zIndex={25}
+            width={650}
+            onClose={() =>
+              setOpenWindows((prev) => ({ ...prev, system: false }))
+            }>
+            <p className="text-zinc-400 text-sm mb-4">
+              <span className="text-violet-400">user@dev</span>:~$ system-status
+            </p>
 
-          <div className="space-y-3 text-sm">
-            <div className="flex justify-between">
-              <span className="text-zinc-400">LOCATION</span>
-              <span className="text-violet-300">Belgium</span>
+            <div className="space-y-3 text-sm">
+              <div className="flex justify-between">
+                <span className="text-zinc-400">LOCATION</span>
+                <span className="text-violet-300">Belgium</span>
+              </div>
+
+              <div className="flex justify-between">
+                <span className="text-zinc-400">COFFEE LEVEL</span>
+                <span className="text-violet-400">████████░░</span>
+              </div>
             </div>
 
-            <div className="flex justify-between">
-              <span className="text-zinc-400">COFFEE LEVEL</span>
-              <span className="text-violet-400">████████░░</span>
+            <div className="mt-6">
+              <GitHubCalendar
+                username="lindseyjorissen"
+                blockSize={8}
+                blockMargin={3}
+                fontSize={10}
+                theme={{
+                  light: [
+                    "#1a1a2e",
+                    "#3b1e6d",
+                    "#5b2bb5",
+                    "#7a33ff",
+                    "#b266ff",
+                  ],
+                  dark: ["#1a1a2e", "#3b1e6d", "#5b2bb5", "#7a33ff", "#b266ff"],
+                }}
+              />
             </div>
-          </div>
-
-          <div className="mt-6">
-            <GitHubCalendar
-              username="lindseyjorissen"
-              blockSize={8}
-              blockMargin={3}
-              fontSize={10}
-              theme={{
-                light: ["#1a1a2e", "#3b1e6d", "#5b2bb5", "#7a33ff", "#b266ff"],
-                dark: ["#1a1a2e", "#3b1e6d", "#5b2bb5", "#7a33ff", "#b266ff"],
-              }}
-            />
-          </div>
-        </TerminalWindow>
+          </TerminalWindow>
         )}
       </div>
 
-      {/*Active widow open new */}
- {activeProject && (
-  <TerminalWindow
-    title={`~/projects/${activeProject.name.toLowerCase().replace(/\s+/g, "-")}`}
-    initialX={400}
-    initialY={150}
-    zIndex={100}
-    width={800}
-    onClose={() => setActiveProject(null)}
-  >
-
+      {/*Specific Project window - Active*/}
+      {activeProject && (
+        <TerminalWindow
+          title={`~/projects/${activeProject.name.toLowerCase().replace(/\s+/g, "-")}`}
+          initialX={400}
+          initialY={150}
+          zIndex={100}
+          width={800}
+          onClose={() => setActiveProject(null)}>
           <div className="space-y-4">
             <h2 className="text-xl text-violet-400 font-bold">
               {activeProject.name}
@@ -400,7 +400,7 @@ export default function Portfolio() {
         </TerminalWindow>
       )}
 
-      {/* Social Dock */}
+      {/* Social Links */}
       <div className="absolute bottom-8 right-5 w-45 flex flex-col gap-2 text-sm font-mono">
         <a
           href="https://github.com/lindseyjorissen"

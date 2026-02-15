@@ -5,10 +5,6 @@ import { useRef, useMemo } from "react";
 import * as THREE from "three";
 import { useGLTF, Center } from "@react-three/drei";
 
-/* -------------------------
-   ASCII MATERIAL SHADER
--------------------------- */
-
 function AsciiMaterial() {
   const material = useMemo(() => {
     return new THREE.ShaderMaterial({
@@ -72,11 +68,6 @@ function AsciiMaterial() {
 
   return material;
 }
-
-/* -------------------------
-   CUP MODEL
--------------------------- */
-
 function CupModel() {
   const meshRef = useRef<THREE.Group>(null);
 const materialRef = useRef<THREE.ShaderMaterial | null>(null);
@@ -97,7 +88,6 @@ const materialRef = useRef<THREE.ShaderMaterial | null>(null);
     if (meshRef.current) {
       meshRef.current.rotation.y += 0.005;
     }
-    // Update time uniform for animations
     if (materialRef.current) {
       materialRef.current.uniforms.time.value = state.clock.elapsedTime;
     }
@@ -114,10 +104,6 @@ const materialRef = useRef<THREE.ShaderMaterial | null>(null);
     </Center>
   );
 }
-
-/* -------------------------
-   MAIN COMPONENT
--------------------------- */
 
 export default function SpinningCup() {
   return (
