@@ -27,22 +27,6 @@ html, body {
   height: auto !important;
 }
 
-.terminal-window {
-  background: rgba(30, 25, 35, 0.60);
-  backdrop-filter: blur(4px);
-
-  border: 1px solid rgba(180, 0, 255, 0.25);
-  border-radius: 14px;
-
-  overflow: hidden;
-
-  box-shadow:
-    0 10px 40px rgba(0, 0, 0, 0.6),
-    0 0 30px rgba(180, 0, 255, 0.08);
-
-  transition: all 0.3s ease;
-}
-
 .terminal-header {
   display: flex;
   align-items: center;
