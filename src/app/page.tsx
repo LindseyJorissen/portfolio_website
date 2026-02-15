@@ -344,6 +344,33 @@ export default function Portfolio() {
           </div>
         </TerminalWindow>
       </div>
+      {/* Social Dock */}
+<div className="absolute bottom-8 right-5 w-[180px] flex flex-col gap-2 text-sm font-mono">
+  <a
+    href="https://github.com/lindseyjorissen"
+    target="_blank"
+className="text-zinc-500 hover:text-violet-400 hover:tracking-wider transition-all duration-200"
+  >
+    [ /dev/github ]
+  </a>
+
+  <a
+    href="https://www.linkedin.com/in/lindseyjorissen/"
+    target="_blank"
+className="text-zinc-500 hover:text-violet-400 hover:tracking-wider transition-all duration-200"
+  >
+    [ /dev/linkedin ]
+  </a>
+
+  <a
+    href="https://twitter.com"
+    target="_blank"
+className="text-zinc-500 hover:text-violet-400 hover:tracking-wider transition-all duration-200"
+  >
+    [ /dev/x ]
+  </a>
+</div>
+
     </div>
   );
 }
