@@ -108,8 +108,8 @@ function CupModel() {
       <primitive
         ref={meshRef}
         object={scene}
-        scale={1.6}
-        position={[0, -0.5, 0]}
+        scale={1.7}
+        position={[0, 0.5, 0]}
       />
     </Center>
   );

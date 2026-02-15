@@ -66,7 +66,7 @@ ctx.fillStyle = "#8756e4";
   return (
     <canvas
       ref={canvasRef}
-      className="fixed inset-0 pointer-events-none z-0 opacity-20"
+      className="fixed inset-0 pointer-events-none z-0 opacity-60"
     />
   );
 }
@@ -105,12 +105,15 @@ function TerminalWindow({
 }) {
   return (
     <div className="terminal-window hover-lift">
-      <div className="terminal-header">
-        <div className="terminal-btn terminal-btn-red" />
-        <div className="terminal-btn terminal-btn-yellow" />
-        <div className="terminal-btn terminal-btn-green" />
-        <span className="text-sm text-muted-foreground ml-2">{title}</span>
-      </div>
+      <div className="terminal-header flex justify-between items-center">
+  <span className="text-sm text-zinc-400 font-mono">{title}</span>
+  <div className="flex items-center gap-4 text-zinc-500 text-xs">
+    <span className="hover:text-violet-400 transition-colors cursor-pointer">—</span>
+    <span className="hover:text-violet-400 transition-colors cursor-pointer">▢</span>
+    <span className="hover:text-red-400 transition-colors cursor-pointer">✕</span>
+  </div>
+</div>
+
       <div className="p-4 sm:p-6">{children}</div>
     </div>
   );
@@ -255,186 +258,151 @@ export default function Portfolio() {
     },
   ];
 
+
+
+
   return (
-<div className="min-h-screen bg-black grid-bg scanlines relative cursor-none">
-      {/* Activate Matrix Rain Background */}
-      <MatrixRain />
-      {/* Activate Custom CUrsor */}
-      <CustomCursor />
+<div className="h-screen w-screen overflow-hidden relative bg-black cursor-none">
+  <MatrixRain />
+  <CustomCursor />
 
-      {/* Navigation */}
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-black/90 backdrop-blur-sm border-b border-zinc-800">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <span className="better-pink font-bold text-lg crt-glow">~/portfolio</span>
-              <span className="cursor-blink text-violet-400">_</span>
-            </div>
-            <div className="flex items-center gap-4 sm:gap-6">
-              <NavLink href="#about">about</NavLink>
-              <NavLink href="#projects">projects</NavLink>
-              <NavLink href="#socials">socials</NavLink>
-            </div>
-          </div>
+  <div className="absolute inset-0 flex items-center justify-center ">
+
+    {/* Workspace Window (Coffee - Back Layer) */}
+    <div className="absolute w-[80%] h-[70%] z-10 -translate-y-14 border-violet-500/10
+shadow-[0_10px_40px_rgba(0,0,0,0.5)]
+">
+      <TerminalWindow title="~/workspace">
+        <div className="flex items-center justify-center h-[500px]">
+          <SpinningCup />
         </div>
-      </nav>
+      </TerminalWindow>
+    </div>
+{/* About Window (Front Layer) */}
+<div
+  className="
+    absolute
+    w-[450px]
+    top-[14%]
+    left-[15%]
+    z-20 border-violet-500/40
+shadow-[0_20px_80px_rgba(180,0,255,0.15)]
 
-      {/* Hero Section */}
-      <section id="about" className="pt-42 pb-50 px-4 sm:px-6">
-        <div className="max-w-6xl mx-auto">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
-            {/* Text Content */}
-            <div className={`space-y-6 ${mounted ? 'fade-in-up' : 'opacity-0'}`}>
-              <div className="space-y-2">
-                <p className="text-muted-foreground text-sm">
-                  <span className="text-violet-400">user@dev</span>:<span className="text-accent">~</span>$ whoami
-                </p>
-<h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold neon-name">
-  Lindsey Jorissen
-</h1>
+  "
+>
+  <TerminalWindow title="~/about">
 
-                <div className="flex items-center gap-2 text-xl sm:text-2xl text-violet-200">
-                  <span className="text-muted-foreground">&gt;</span>
-                  <span>{displayedText}</span>
-                  {!isComplete && <span className="cursor-blink text-violet-400">|</span>}
-                </div>
-              </div>
-
-              <p className="text-muted-foreground leading-relaxed max-w-lg">
-                I build things that live on the internet. Usually when I want something no one has made before.
-              </p>
-
-              <div className="flex items-center gap-4 text-sm">
-                <span className="text-muted-foreground">{`// based in Belgium`}</span>
-                
-              </div>
-<div className="pt-8 react-github-calendar w-full max-w-xl">
-<GitHubCalendar
-  username="lindseyjorissen"
-  blockSize={12}
-  blockMargin={4}
-  fontSize={14}
-  hideColorLegend
-  theme={{
-    light: [
-      "#1a1a2e",   // empty
-      "#3b1e6d",
-      "#5b2bb5",
-      "#7a33ff",
-      "#b266ff"    // strongest
-    ],
-    dark: [
-      "#1a1a2e",
-      "#3b1e6d",
-      "#5b2bb5",
-      "#7a33ff",
-      "#b266ff"
-    ]
-  }}
-/>
-
-  </div>
-
-
-
-            </div>
-
-            <div className="flex justify-center items-center">
-<SpinningCup />
-</div>
-
-          </div>
-        </div>
-      </section>
-
-      <Separator className="max-w-xl mx-auto bg-border/50" />
-
-      {/* Projects Section */}
-<section id="projects" className="pt-20 pb-20 px-4 sm:px-6">
-        <div className="max-w-6xl mx-auto">
-          <div className="mb-12">
-            <p className="text-muted-foreground text-sm mb-2">
-              <span className="text-violet-400">user@dev</span>:<span className="text-accent">~/projects</span>$ ls -la
-            </p>
-            <h2 className="text-3xl sm:text-4xl font-bold text-violet-400">Featured Projects</h2>
-            <p className="text-muted-foreground mt-2">Some things I've built</p>
-          </div>
-
-          <div className="grid md:grid-cols-2 gap-6">
-            {projects.map((project, index) => (
-              <div
-                key={project.title}
-                className={`${mounted ? `fade-in-up delay-${index + 1}` : 'opacity-0'}`}
-              >
-                <ProjectCard {...project} />
-              </div>
-            ))}
-          </div>
-
-          <div className="mt-8 text-center">
-            <p className="text-muted-foreground text-sm">
-              <span className="text-violet-400">$</span> git log --oneline | wc -l
-              <span className="ml-2 text-accent">→ 1,247 commits this year</span>
-            </p>
-          </div>
-        </div>
-      </section>
-
-      <Separator className="max-w-6xl mx-auto bg-border/50" />
-
-{/* Socials Section */}
-<section id="socials" className="py-32 px-4 sm:px-6">
-  <div className="max-w-6xl mx-auto text-center">
-
-    <p className="text-zinc-500 text-sm mb-2">
-      <span className="text-violet-400">user@dev</span>:~$ ls socials/
+    <p className="text-zinc-400 text-sm mb-2">
+      <span className="text-violet-400">user@dev</span>:~$ whoami
     </p>
 
-    <h2 className="text-3xl sm:text-4xl font-bold text-violet-400 mb-12">
-      Socials
-    </h2>
+    <h1 className="text-2xl font-bold neon-name mb-2">
+      Lindsey Jorissen
+    </h1>
 
-    <div className="flex justify-center gap-10 text-lg">
-
-      <a
-        href="https://github.com/lindseyjorissen"
-        target="_blank"
-        className="text-zinc-400 hover:text-violet-400 transition-colors"
-      >
-        GitHub
-      </a>
-
-      <a
-        href="https://www.linkedin.com/in/lindseyjorissen/"
-        target="_blank"
-        className="text-zinc-400 hover:text-violet-400 transition-colors"
-      >
-        LinkedIn
-      </a>
-
-      <a
-        href="https://twitter.com"
-        target="_blank"
-        className="text-zinc-400 hover:text-violet-400 transition-colors"
-      >
-        Twitter
-      </a>
-
+    <div className="flex items-center gap-2 text-lg text-violet-200 mb-4">
+      <span className="text-zinc-500">&gt;</span>
+      <span>{displayedText}</span>
+      {!isComplete && (
+        <span className="cursor-blink text-violet-400">|</span>
+      )}
     </div>
-  </div>
-</section>
 
-      {/* Footer */}
-      <footer className="py-8 px-4 sm:px-6 border-t border-zinc-800">
-        <div className="max-w-6xl mx-auto text-center">
-          <p className="text-muted-foreground text-sm">
-            <span className="text-violet-400">$</span> echo &quot;Built with Next.js, TypeScript &amp; lots of coffee&quot;
-          </p>
-          <p className="text-muted-foreground/50 text-xs mt-2">
-            © 2026 Lindsey Jorissen. All rights reserved.
-          </p>
+    <p className="text-zinc-400 text-sm mb-4">
+      I build systems that live on the internet.
+      Usually when I want something no one has made before.
+    </p>
+
+  </TerminalWindow>
+</div>
+{/* Projects Window (Top Layer) */}
+<div
+  className="
+    absolute
+    w-[550px]
+    top-[22%]
+    right-[5%]
+    z-30     z-20 border-violet-500/40
+shadow-[0_20px_80px_rgba(180,0,255,0.15)]
+
+  "
+>
+  <TerminalWindow title="~/projects">
+
+    <p className="text-zinc-400 text-sm mb-4">
+      <span className="text-violet-400">user@dev</span>:~/projects$ ls
+    </p>
+
+    <div className="space-y-4">
+      {projects.slice(0, 3).map((project) => (
+        <div
+          key={project.title}
+          className="group cursor-pointer"
+        >
+          <div className="text-violet-400 font-mono text-sm">
+            {project.title}
+          </div>
+          <div className="text-zinc-400 text-xs">
+            {project.description}
+          </div>
         </div>
-      </footer>
+      ))}
     </div>
-  );
+
+  </TerminalWindow>
+</div>
+{/* System Window */}
+<div
+  className="
+    absolute
+    w-[650px]
+    bottom-[7%]
+    left-[3%]
+    z-25
+    rotate-[-0.5deg]     z-20 border-violet-500/40
+shadow-[0_20px_80px_rgba(180,0,255,0.15)]
+
+  "
+>
+  <TerminalWindow title="~/system">
+
+    <p className="text-zinc-400 text-sm mb-4">
+      <span className="text-violet-400">user@dev</span>:~$ system-status
+    </p>
+
+    <div className="space-y-3 text-sm">
+
+      <div className="flex justify-between">
+        <span className="text-zinc-400">LOCATION</span>
+        <span className="text-violet-300">Belgium</span>
+      </div>
+
+      <div className="flex justify-between">
+        <span className="text-zinc-400">COFFEE LEVEL</span>
+        <span className="text-violet-400">████████░░</span>
+      </div>
+
+    </div>
+
+    <div className="mt-6">
+      <GitHubCalendar
+        username="lindseyjorissen"
+        blockSize={8}
+        blockMargin={3}
+        fontSize={10}
+        hideColorLegend
+        theme={{
+          light: ["#1a1a2e","#3b1e6d","#5b2bb5","#7a33ff","#b266ff"],
+          dark: ["#1a1a2e","#3b1e6d","#5b2bb5","#7a33ff","#b266ff"]
+        }}
+      />
+    </div>
+
+  </TerminalWindow>
+</div>
+
+  </div>
+</div>
+
+);
 }

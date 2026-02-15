@@ -10,21 +10,6 @@ html, body {
   border-color: #1f1f23;
 }
 
-.better-pink {
- color:#c831c8;
-}
-.better-pink-bg{
- background-color: #da2ac3;
-}
-
-.neon-name {
-  color: #d1a0fa;
-  text-shadow:
-    0 0 5px #6b09ac,
-    0 0 10px #6b09ac,
-    0 0 20px #6b09ac;
-}
-
 .react-github-calendar {
   overflow-x: hidden !important;
 }
@@ -41,3 +26,30 @@ html, body {
   width: 100% !important;
   height: auto !important;
 }
+
+.terminal-window {
+  background: rgba(30, 25, 35, 0.60);
+  backdrop-filter: blur(4px);
+
+  border: 1px solid rgba(180, 0, 255, 0.25);
+  border-radius: 14px;
+
+  overflow: hidden;
+
+  box-shadow:
+    0 10px 40px rgba(0, 0, 0, 0.6),
+    0 0 30px rgba(180, 0, 255, 0.08);
+
+  transition: all 0.3s ease;
+}
+
+.terminal-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 8px 6px 8px;
+  background: rgba(25, 25, 35, 0.9);
+  border-bottom: 1px solid rgba(192, 104, 255, 0.15);
+  font-family: monospace;
+}
+
