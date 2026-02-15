@@ -247,7 +247,7 @@ export default function Portfolio() {
           initialY={90}
           zIndex={10}
           width={1180}>
-          <div className="flex items-center justify-center h-[500px]">
+          <div className="flex items-center justify-center h-125">
             <SpinningCup />
           </div>
         </TerminalWindow>
@@ -335,7 +335,6 @@ export default function Portfolio() {
               blockSize={8}
               blockMargin={3}
               fontSize={10}
-              hideColorLegend
               theme={{
                 light: ["#1a1a2e", "#3b1e6d", "#5b2bb5", "#7a33ff", "#b266ff"],
                 dark: ["#1a1a2e", "#3b1e6d", "#5b2bb5", "#7a33ff", "#b266ff"],
@@ -345,7 +344,7 @@ export default function Portfolio() {
         </TerminalWindow>
       </div>
       {/* Social Dock */}
-<div className="absolute bottom-8 right-5 w-[180px] flex flex-col gap-2 text-sm font-mono">
+<div className="absolute bottom-8 right-5 w-45 flex flex-col gap-2 text-sm font-mono">
   <a
     href="https://github.com/lindseyjorissen"
     target="_blank"

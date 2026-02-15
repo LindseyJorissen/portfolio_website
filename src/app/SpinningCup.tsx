@@ -79,7 +79,7 @@ function AsciiMaterial() {
 
 function CupModel() {
   const meshRef = useRef<THREE.Group>(null);
-  const materialRef = useRef<THREE.ShaderMaterial>();
+const materialRef = useRef<THREE.ShaderMaterial | null>(null);
   const { scene } = useGLTF("/models/coffeecup.glb");
 
   const asciiMaterial = AsciiMaterial();
