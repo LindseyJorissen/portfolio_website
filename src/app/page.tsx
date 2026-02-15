@@ -111,6 +111,7 @@ function TerminalWindow({
   zIndex: number;
   width: number;
 }) {
+  
   const [position, setPosition] = useState({
   x: initialX,
   y: initialY,
@@ -119,6 +120,29 @@ function TerminalWindow({
 const [isDragging, setIsDragging] = useState(false);
 
 const dragOffset = useRef({ x: 0, y: 0 });
+
+useEffect(() => {
+  const handleMouseMove = (e: MouseEvent) => {
+    if (!isDragging) return;
+
+    setPosition({
+      x: e.clientX - dragOffset.current.x,
+      y: e.clientY - dragOffset.current.y,
+    });
+  };
+
+  const handleMouseUp = () => {
+    setIsDragging(false);
+  };
+
+  window.addEventListener("mousemove", handleMouseMove);
+  window.addEventListener("mouseup", handleMouseUp);
+
+  return () => {
+    window.removeEventListener("mousemove", handleMouseMove);
+    window.removeEventListener("mouseup", handleMouseUp);
+  };
+}, [isDragging]);
 
   return (
     <div
@@ -137,7 +161,16 @@ top: position.y,
         shadow-[0_20px_60px_rgba(0,0,0,0.6)]
         overflow-hidden
       ">
-      <div className="terminal-header flex justify-between items-center">
+<div
+  className="terminal-header flex justify-between items-center cursor-move select-none"
+  onMouseDown={(e) => {
+    setIsDragging(true);
+    dragOffset.current = {
+      x: e.clientX - position.x,
+      y: e.clientY - position.y,
+    };
+  }}
+>
         <span className="text-sm text-zinc-400 font-mono">{title}</span>
         <div className="flex items-center gap-4 text-zinc-500 text-xs">
           <span className="hover:text-violet-400 transition-colors cursor-pointer">
