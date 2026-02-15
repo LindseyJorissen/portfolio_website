@@ -103,6 +103,7 @@ function TerminalWindow({
   initialY,
   zIndex,
   width,
+  onClose,
 }: {
   title: string;
   children: React.ReactNode;
@@ -110,46 +111,46 @@ function TerminalWindow({
   initialY: number;
   zIndex: number;
   width: number;
+  onClose?: () => void;
 }) {
-  
   const [position, setPosition] = useState({
-  x: initialX,
-  y: initialY,
-});
+    x: initialX,
+    y: initialY,
+  });
 
-const [isDragging, setIsDragging] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
 
-const dragOffset = useRef({ x: 0, y: 0 });
+  const dragOffset = useRef({ x: 0, y: 0 });
 
-useEffect(() => {
-  const handleMouseMove = (e: MouseEvent) => {
-    if (!isDragging) return;
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      if (!isDragging) return;
 
-    setPosition({
-      x: e.clientX - dragOffset.current.x,
-      y: e.clientY - dragOffset.current.y,
-    });
-  };
+      setPosition({
+        x: e.clientX - dragOffset.current.x,
+        y: e.clientY - dragOffset.current.y,
+      });
+    };
 
-  const handleMouseUp = () => {
-    setIsDragging(false);
-  };
+    const handleMouseUp = () => {
+      setIsDragging(false);
+    };
 
-  window.addEventListener("mousemove", handleMouseMove);
-  window.addEventListener("mouseup", handleMouseUp);
+    window.addEventListener("mousemove", handleMouseMove);
+    window.addEventListener("mouseup", handleMouseUp);
 
-  return () => {
-    window.removeEventListener("mousemove", handleMouseMove);
-    window.removeEventListener("mouseup", handleMouseUp);
-  };
-}, [isDragging]);
+    return () => {
+      window.removeEventListener("mousemove", handleMouseMove);
+      window.removeEventListener("mouseup", handleMouseUp);
+    };
+  }, [isDragging]);
 
   return (
     <div
       style={{
         position: "absolute",
-      left: position.x,
-top: position.y,
+        left: position.x,
+        top: position.y,
         width: width,
         zIndex: zIndex,
       }}
@@ -161,16 +162,15 @@ top: position.y,
         shadow-[0_20px_60px_rgba(0,0,0,0.6)]
         overflow-hidden
       ">
-<div
-  className="terminal-header flex justify-between items-center cursor-move select-none"
-  onMouseDown={(e) => {
-    setIsDragging(true);
-    dragOffset.current = {
-      x: e.clientX - position.x,
-      y: e.clientY - position.y,
-    };
-  }}
->
+      <div
+        className="terminal-header flex justify-between items-center cursor-move select-none"
+        onMouseDown={(e) => {
+          setIsDragging(true);
+          dragOffset.current = {
+            x: e.clientX - position.x,
+            y: e.clientY - position.y,
+          };
+        }}>
         <span className="text-sm text-zinc-400 font-mono">{title}</span>
         <div className="flex items-center gap-4 text-zinc-500 text-xs">
           <span className="hover:text-violet-400 transition-colors cursor-pointer">
@@ -179,7 +179,9 @@ top: position.y,
           <span className="hover:text-violet-400 transition-colors cursor-pointer">
             ▢
           </span>
-          <span className="hover:text-red-400 transition-colors cursor-pointer">
+          <span
+            onClick={onClose}
+            className="hover:text-red-400 transition-colors cursor-pointer">
             ✕
           </span>
         </div>
@@ -191,6 +193,18 @@ top: position.y,
 }
 
 export default function Portfolio() {
+  const [activeProject, setActiveProject] = useState<null | {
+    name: string;
+    description: string;
+    stack: string;
+  }>(null);
+  const [openWindows, setOpenWindows] = useState({
+    workspace: true,
+    about: true,
+    projects: true,
+    system: true,
+  });
+
   const { displayedText, isComplete } = useTypewriter(
     "Fullstack Developer",
     80,
@@ -203,35 +217,31 @@ export default function Portfolio() {
 
   const projects = [
     {
-      title: "Cloud Infrastructure Dashboard",
+      title: "Booktomo",
       description:
-        "Real-time monitoring system for distributed cloud services with WebSocket connections and dynamic visualizations.",
-      tags: ["React", "Node.js", "WebSocket", "D3.js"],
-      command: "cat projects/cloud-dashboard.md",
+        "Reading analytics platform that visualizes your book data in interactive graphs. Uses NetworkX to generate relationship graphs and suggest new books based on your own reading patterns.",
+      stack: "Django + React",
       link: "#",
     },
     {
-      title: "AI Code Review Bot",
+      title: "Pookiebase",
       description:
-        "GitHub integration that automatically reviews PRs using machine learning to detect bugs and suggest improvements.",
-      tags: ["Python", "FastAPI", "OpenAI", "GitHub API"],
-      command: "cat projects/ai-reviewer.md",
+        "Mobile-first book collection manager with ISBN scanner. Pulls metadata from Google Books API to generate previews before adding to collection or wishlist.",
+      stack: "Flask",
       link: "#",
     },
     {
-      title: "E-Commerce Platform",
+      title: "Spacewise",
       description:
-        "Full-featured marketplace with payment processing, inventory management, and real-time order tracking.",
-      tags: ["Next.js", "PostgreSQL", "Stripe", "Redis"],
-      command: "cat projects/marketplace.md",
+        "Property intelligence platform focused on spatial data and smart filtering. Integrates geolocation APIs and structured property datasets to surface meaningful real-estate insights.",
+      stack: "Django",
       link: "#",
     },
     {
-      title: "DevOps Pipeline Generator",
+      title: "This Portfolio",
       description:
-        "CLI tool that generates CI/CD configurations based on project analysis and best practices.",
-      tags: ["Go", "Docker", "Kubernetes", "GitHub Actions"],
-      command: "cat projects/pipeline-gen.md",
+        "Cyberpunk terminal-style portfolio with draggable glass windows, custom matrix rain canvas, and a Three.js shaded coffee cup.",
+      stack: "Next.js + Tailwind + Three.js",
       link: "#",
     },
   ];
@@ -241,24 +251,32 @@ export default function Portfolio() {
       <MatrixRain />
       <div className="absolute inset-0">
         {/* Workspace Window (Coffee - Back Layer) */}
+        {openWindows.workspace && (
         <TerminalWindow
           title="~/workspace"
           initialX={150}
           initialY={90}
           zIndex={10}
-          width={1180}>
+          width={1180}
+                onClose={() =>
+      setOpenWindows((prev) => ({ ...prev, workspace: false }))
+                }>
           <div className="flex items-center justify-center h-125">
             <SpinningCup />
           </div>
         </TerminalWindow>
-
+        )}
         {/* About Window (Front Layer) */}
+        {openWindows.about && (
         <TerminalWindow
           title="~/about"
           initialX={230}
           initialY={130}
           zIndex={20}
-          width={420}>
+          width={420}
+                          onClose={() =>
+      setOpenWindows((prev) => ({ ...prev, about: false }))
+                }>
           <p className="text-zinc-400 text-sm mb-2">
             <span className="text-violet-400">user@dev</span>:~$ whoami
           </p>
@@ -280,39 +298,51 @@ export default function Portfolio() {
             something no one has made before.
           </p>
         </TerminalWindow>
-
+        )}
         {/* Projects Window (Top Layer) */}
+        {openWindows.projects && (
         <TerminalWindow
           title="~/projects"
           initialX={880}
-          initialY={200}
+          initialY={190}
           zIndex={30}
-          width={550}>
+          width={550}
+                          onClose={() =>
+      setOpenWindows((prev) => ({ ...prev, projects: false }))
+                }>
           <p className="text-zinc-400 text-sm mb-4">
             <span className="text-violet-400">user@dev</span>:~/projects$ ls
           </p>
 
-          <div className="space-y-4">
-            {projects.slice(0, 3).map((project) => (
-              <div key={project.title} className="group cursor-pointer">
-                <div className="text-violet-400 font-mono text-sm">
-                  {project.title}
-                </div>
-                <div className="text-zinc-400 text-xs">
-                  {project.description}
-                </div>
+          <div className="space-y-2 font-mono text-sm">
+            {projects.map((project) => (
+              <div
+                key={project.title}
+                className="text-violet-400 font-mono text-sm cursor-pointer hover:text-pink-400 transition-colors"
+                onClick={() =>
+                  setActiveProject({
+                    name: project.title,
+                    description: project.description,
+                    stack: project.stack,
+                  })
+                }>
+                drwxr-xr-x {project.title.toLowerCase().replace(/\s/g, "-")}
               </div>
             ))}
           </div>
         </TerminalWindow>
-
+        )}
         {/* System Window */}
+        {openWindows.system && (
         <TerminalWindow
           title="~/system"
           initialX={50}
           initialY={480}
           zIndex={25}
-          width={650}>
+          width={650}
+                          onClose={() =>
+      setOpenWindows((prev) => ({ ...prev, system: false }))
+}>
           <p className="text-zinc-400 text-sm mb-4">
             <span className="text-violet-400">user@dev</span>:~$ system-status
           </p>
@@ -342,34 +372,57 @@ export default function Portfolio() {
             />
           </div>
         </TerminalWindow>
+        )}
       </div>
+
+      {/*Active widow open new */}
+ {activeProject && (
+  <TerminalWindow
+    title={`~/projects/${activeProject.name.toLowerCase().replace(/\s+/g, "-")}`}
+    initialX={400}
+    initialY={150}
+    zIndex={100}
+    width={800}
+    onClose={() => setActiveProject(null)}
+  >
+
+          <div className="space-y-4">
+            <h2 className="text-xl text-violet-400 font-bold">
+              {activeProject.name}
+            </h2>
+
+            <p className="text-zinc-400 text-sm">{activeProject.description}</p>
+
+            <div className="text-xs text-pink-400 font-mono">
+              stack: {activeProject.stack}
+            </div>
+          </div>
+        </TerminalWindow>
+      )}
+
       {/* Social Dock */}
-<div className="absolute bottom-8 right-5 w-45 flex flex-col gap-2 text-sm font-mono">
-  <a
-    href="https://github.com/lindseyjorissen"
-    target="_blank"
-className="text-zinc-500 hover:text-violet-400 hover:tracking-wider transition-all duration-200"
-  >
-    [ /dev/github ]
-  </a>
+      <div className="absolute bottom-8 right-5 w-45 flex flex-col gap-2 text-sm font-mono">
+        <a
+          href="https://github.com/lindseyjorissen"
+          target="_blank"
+          className="text-zinc-500 hover:text-violet-400 hover:tracking-wider transition-all duration-200">
+          [ /dev/github ]
+        </a>
 
-  <a
-    href="https://www.linkedin.com/in/lindseyjorissen/"
-    target="_blank"
-className="text-zinc-500 hover:text-violet-400 hover:tracking-wider transition-all duration-200"
-  >
-    [ /dev/linkedin ]
-  </a>
+        <a
+          href="https://www.linkedin.com/in/lindseyjorissen/"
+          target="_blank"
+          className="text-zinc-500 hover:text-violet-400 hover:tracking-wider transition-all duration-200">
+          [ /dev/linkedin ]
+        </a>
 
-  <a
-    href="https://twitter.com"
-    target="_blank"
-className="text-zinc-500 hover:text-violet-400 hover:tracking-wider transition-all duration-200"
-  >
-    [ /dev/x ]
-  </a>
-</div>
-
+        <a
+          href="https://twitter.com"
+          target="_blank"
+          className="text-zinc-500 hover:text-violet-400 hover:tracking-wider transition-all duration-200">
+          [ /dev/x ]
+        </a>
+      </div>
     </div>
   );
 }
