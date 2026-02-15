@@ -9,7 +9,7 @@ function AsciiMaterial() {
   const material = useMemo(() => {
     return new THREE.ShaderMaterial({
       uniforms: {
-        color: { value: new THREE.Color("#c825f4") },
+        color: { value: new THREE.Color("#a255d9") },
         pixelSize: { value: 5.0 },
         time: { value: 0 },
       },
