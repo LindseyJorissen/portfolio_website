@@ -99,6 +99,8 @@ function TerminalWindow({
   initialY,
   zIndex,
   width,
+  scale = 1,
+  centered = false,
   onClose,
 }: {
   title: string;
@@ -107,6 +109,8 @@ function TerminalWindow({
   initialY: number;
   zIndex: number;
   width: number;
+  scale?: number;
+  centered?: boolean;
   onClose?: () => void;
 }) {
   const [position, setPosition] = useState({
@@ -115,6 +119,8 @@ function TerminalWindow({
   });
 
   const [isDragging, setIsDragging] = useState(false);
+  const [hasBeenDragged, setHasBeenDragged] = useState(false);
+  const windowRef = useRef<HTMLDivElement>(null);
 
   const dragOffset = useRef({ x: 0, y: 0 });
 
@@ -123,8 +129,8 @@ function TerminalWindow({
       if (!isDragging) return;
 
       setPosition({
-        x: e.clientX - dragOffset.current.x,
-        y: e.clientY - dragOffset.current.y,
+        x: e.clientX / scale - dragOffset.current.x,
+        y: e.clientY / scale - dragOffset.current.y,
       });
     };
 
@@ -139,14 +145,18 @@ function TerminalWindow({
       window.removeEventListener("mousemove", handleMouseMove);
       window.removeEventListener("mouseup", handleMouseUp);
     };
-  }, [isDragging]);
+  }, [isDragging, scale]);
+
+  const isCentered = centered && !hasBeenDragged;
 
   return (
     <div
+      ref={windowRef}
       style={{
         position: "absolute",
-        left: position.x,
-        top: position.y,
+        ...(isCentered
+          ? { left: "50%", top: "50%", transform: "translate(-50%, -50%)" }
+          : { left: position.x, top: position.y }),
         width: width,
         zIndex: zIndex,
       }}
@@ -161,11 +171,23 @@ function TerminalWindow({
       <div
         className="terminal-header flex justify-between items-center cursor-move select-none"
         onMouseDown={(e) => {
+          if (isCentered && windowRef.current) {
+            const rect = windowRef.current.getBoundingClientRect();
+            const newX = rect.left / scale;
+            const newY = rect.top / scale;
+            setPosition({ x: newX, y: newY });
+            setHasBeenDragged(true);
+            dragOffset.current = {
+              x: e.clientX / scale - newX,
+              y: e.clientY / scale - newY,
+            };
+          } else {
+            dragOffset.current = {
+              x: e.clientX / scale - position.x,
+              y: e.clientY / scale - position.y,
+            };
+          }
           setIsDragging(true);
-          dragOffset.current = {
-            x: e.clientX - position.x,
-            y: e.clientY - position.y,
-          };
         }}>
         <span className="text-sm text-zinc-400 font-mono">{title}</span>
         <div className="flex items-center gap-4 text-zinc-500 text-xs">
@@ -196,7 +218,7 @@ export default function Portfolio() {
     description: string;
     stack: string;
     images: string[];
-
+    layout: "landscape" | "portrait";
   }>(null);
   const [openWindows, setOpenWindows] = useState({
     workspace: true,
@@ -204,6 +226,48 @@ export default function Portfolio() {
     projects: true,
     system: true,
   });
+// Below these thresholds, content scales down to fit
+const MIN_LAYOUT_WIDTH = 1200;
+const MIN_LAYOUT_HEIGHT = 700;
+
+const [viewport, setViewport] = useState({
+  width: 0,
+  height: 0,
+  scale: 1,
+});
+
+useEffect(() => {
+  const updateSize = () => {
+    const w = window.innerWidth;
+    const h = window.innerHeight;
+    const isUltrawide = w / h > 2;
+
+    let layoutW: number, layoutH: number, scale: number;
+
+    if (isUltrawide) {
+      // Ultrawide: constrain content to a 16:9 area, centered
+      layoutW = Math.round(h * (16 / 9));
+      layoutH = h;
+      scale = 1;
+    } else if (w < MIN_LAYOUT_WIDTH || h < MIN_LAYOUT_HEIGHT) {
+      // Small screen: lay out at minimum size, then scale to fit
+      layoutW = MIN_LAYOUT_WIDTH;
+      layoutH = MIN_LAYOUT_HEIGHT;
+      scale = Math.min(w / MIN_LAYOUT_WIDTH, h / MIN_LAYOUT_HEIGHT);
+    } else {
+      // Normal screen: use actual dimensions, no scaling
+      layoutW = w;
+      layoutH = h;
+      scale = 1;
+    }
+
+    setViewport({ width: layoutW, height: layoutH, scale });
+  };
+
+  updateSize();
+  window.addEventListener("resize", updateSize);
+  return () => window.removeEventListener("resize", updateSize);
+}, []);
 
   const { displayedText, isComplete } = useTypewriter(
     "Fullstack Developer",
@@ -225,28 +289,55 @@ useEffect(() => {
         "Reading analytics platform that visualizes your book data in interactive graphs. Uses NetworkX to generate relationship graphs and suggest new books based on your own reading patterns.",
       stack: "Django + React",
       link: "#",
+      layout: "landscape" as const,
         images: [
       "/screenshots/booktomo-1.png",
       "/screenshots/booktomo-2.png",
     ],
     },
-    {
-      title: "Pookiebase",
-      description:
-        "Mobile-first book collection manager with ISBN scanner. Pulls metadata from Google Books API to generate previews before adding to collection or wishlist.",
-      stack: "Flask",
-      link: "#",
-        images: [
-      "/screenshots/pookiebase-1.jpeg",
-      "/screenshots/pookiebase-2.jpeg",
-    ],
-    },
+ {
+  title: "Pookiebase",
+  description: `
+Pookiebase started with a simple thought:
+
+“I want to catalog my book collection, but I don’t want to make another spreadsheet.”
+
+There are plenty of book collection apps available, but every option we tried either included unnecessary features or lacked functionality we actually wanted. There wasn’t a perfect fit — so my fiancé and I decided to build our own.
+
+Built as a mobile-first Flask application, Pookiebase allows users to scan an ISBN barcode, instantly fetch metadata from the Google Books API, preview the book, and decide whether it belongs in their collection or wishlist.
+
+The collection can be:
+• Searched  
+• Filtered  
+• Grouped by author or genre  
+• Enriched with purchase price data  
+
+A future feature may include looking up market prices to estimate the overall value of the collection.
+
+The project was built collaboratively and is self-hosted on our own home server, giving us full control over deployment and data ownership. It combines backend logic in Python with Jinja templating and frontend interactivity in JavaScript, all backed by a local database.
+
+The next evolution is transforming Pookiebase into a full Android app with native camera integration and app store distribution.
+  `,
+  stack: "Flask · Python · Jinja · HTML · CSS · JavaScript",
+  link: "#",
+  layout: "portrait" as const,
+  images: [
+    "/screenshots/pookiebase-1.jpeg",
+    "/screenshots/pookiebase-2.jpeg",
+        "/screenshots/pookiebase-3.jpeg",
+    "/screenshots/pookiebase-4.jpeg",
+    "/screenshots/pookiebase-5.jpeg",
+
+  ],
+}
+,
     {
       title: "Spacewise",
       description:
         "Property intelligence platform focused on spatial data and smart filtering. Integrates geolocation APIs and structured property datasets to surface meaningful real-estate insights.",
       stack: "Django",
       link: "#",
+      layout: "landscape" as const,
         images: [
       "/screenshots/spacewise-1.png",
       "/screenshots/spacewise-2.png",
@@ -258,25 +349,39 @@ useEffect(() => {
         "Cyberpunk terminal-style portfolio with draggable glass windows, custom matrix rain canvas, and a Three.js shaded coffee cup.",
       stack: "Next.js + Tailwind + Three.js",
       link: "#",
+      layout: "landscape" as const,
         images: [
       "/screenshots/portfolio-1.png",
       "/screenshots/portfolio-2.png",
     ],
     },
   ];
+if (!mounted) return null;
 
   return (
     <div className="h-screen w-screen overflow-hidden relative bg-black">
       <MatrixRain />
-      <div className="absolute inset-0">
+      <div
+        className="absolute inset-0 flex items-center justify-center"
+      >
+        <div
+          style={{
+            width: viewport.width,
+            height: viewport.height,
+            transform: `scale(${viewport.scale})`,
+            transformOrigin: "center center",
+          }}
+          className="relative"
+        >
         {/* Workspace Window (Coffee)*/}
         {openWindows.workspace && (
           <TerminalWindow
             title="~/workspace"
-            initialX={150}
-            initialY={90}
+            initialX={viewport.width * 0.11}
+            initialY={viewport.height * 0.08}
             zIndex={10}
-            width={1180}
+            width={viewport.width * 0.79}
+            scale={viewport.scale}
             onClose={() =>
               setOpenWindows((prev) => ({ ...prev, workspace: false }))
             }>
@@ -289,10 +394,11 @@ useEffect(() => {
         {openWindows.about && (
           <TerminalWindow
             title="~/about"
-            initialX={230}
-            initialY={130}
+            initialX={viewport.width * 0.15}
+            initialY={viewport.height * 0.15}
             zIndex={20}
-            width={420}
+            width={viewport.width * 0.28}
+            scale={viewport.scale}
             onClose={() =>
               setOpenWindows((prev) => ({ ...prev, about: false }))
             }>
@@ -322,10 +428,11 @@ useEffect(() => {
         {openWindows.projects && (
           <TerminalWindow
             title="~/projects"
-            initialX={880}
-            initialY={190}
+            initialX={viewport.width * 0.60}
+            initialY={viewport.height * 0.22}
             zIndex={30}
-            width={550}
+            width={viewport.width * 0.34}
+            scale={viewport.scale}
             onClose={() =>
               setOpenWindows((prev) => ({ ...prev, projects: false }))
             }>
@@ -344,7 +451,7 @@ useEffect(() => {
                       description: project.description,
                       stack: project.stack,
                       images: project.images,
-
+                      layout: project.layout,
                     })
                   }>
                   drwxr-xr-x {project.title.toLowerCase().replace(/\s/g, "-")}
@@ -357,10 +464,11 @@ useEffect(() => {
         {openWindows.system && (
           <TerminalWindow
             title="~/system"
-            initialX={50}
-            initialY={480}
+            initialX={viewport.width * 0.05}
+            initialY={viewport.height * 0.59}
             zIndex={25}
-            width={650}
+            width={viewport.width * 0.43}
+            scale={viewport.scale}
             onClose={() =>
               setOpenWindows((prev) => ({ ...prev, system: false }))
             }>
@@ -400,69 +508,126 @@ useEffect(() => {
             </div>
           </TerminalWindow>
         )}
-      </div>
-
       {/*Specific Project window - Active*/}
       {activeProject && (
         <TerminalWindow
           title={`~/projects/${activeProject.name.toLowerCase().replace(/\s+/g, "-")}`}
-          initialX={400}
-          initialY={150}
+          initialX={(viewport.width * 0.5) - (viewport.width * 0.65) / 2}
+          initialY={0}
           zIndex={100}
-          width={800}
+          width={viewport.width * 0.65}
+          scale={viewport.scale}
+          centered
           onClose={() => setActiveProject(null)}>
-<div className="space-y-6">
+{(() => {
+  const currentSrc = activeProject.images?.[currentImageIndex];
+  const isVideo = currentSrc?.match(/\.(mp4|webm|mov)$/i);
+  const hasMultiple = activeProject.images?.length > 1;
 
-  <h2 className="text-xl text-violet-400 font-bold">
-    {activeProject.name}
-  </h2>
+  const rawMedia = currentSrc && (
+    isVideo ? (
+      <video
+        key={currentSrc}
+        src={currentSrc}
+        autoPlay
+        loop
+        muted
+        playsInline
+        className={activeProject.layout === "portrait"
+          ? "w-full h-full object-cover"
+          : "w-full max-h-[500px] object-contain rounded-lg border border-violet-500/20"
+        }
+      />
+    ) : (
+      <img
+        src={currentSrc}
+        alt="Project screenshot"
+        className={activeProject.layout === "portrait"
+          ? "w-full h-full object-cover"
+          : "w-full max-h-[500px] object-contain rounded-lg border border-violet-500/20"
+        }
+      />
+    )
+  );
 
-  {/* Screenshot Carousel */}
-  <p className="text-zinc-400 text-sm">
-    {activeProject.description}
-  </p>
-
-  <div className="text-xs text-pink-400 font-mono">
-    stack: {activeProject.stack}
-  </div>
-
-  {activeProject.images?.length > 0 && (
-    <div className="relative">
-
-<img
-  src={activeProject.images[currentImageIndex]}
-  alt="Project screenshot"
-  className="w-full max-h-[400px] object-contain rounded-lg border border-violet-500/20"
-/>
-
-
-      {/* Left Arrow */}
-      {currentImageIndex > 0 && (
-        <button
-          onClick={() =>
-            setCurrentImageIndex((prev) => prev - 1)
-          }
-          className="absolute left-2 top-1/2 -translate-y-1/2 text-violet-400 hover:text-white"
-        >
-          ◀
-        </button>
-      )}
-
-      {/* Right Arrow */}
-      {currentImageIndex < activeProject.images.length - 1 && (
-        <button
-          onClick={() =>
-            setCurrentImageIndex((prev) => prev + 1)
-          }
-          className="absolute right-2 top-1/2 -translate-y-1/2 text-violet-400 hover:text-white"
-        >
-          ▶
-        </button>
-      )}
-
+  // Wrap portrait media in a phone mockup
+  const media = activeProject.layout === "portrait" ? (
+    <div className="relative h-[580px] w-[284px]">
+      {/* Phone bezel */}
+      <div className="absolute inset-0 rounded-[2.5rem] border-[3px] border-zinc-600 bg-zinc-900 shadow-[0_0_30px_rgba(139,92,246,0.15)]">
+        {/* Notch / dynamic island */}
+        <div className="absolute top-2 left-1/2 -translate-x-1/2 w-20 h-5 bg-zinc-900 rounded-full border border-zinc-700 z-10" />
+        {/* Screen */}
+        <div className="absolute inset-[3px] rounded-[2.2rem] overflow-hidden bg-black">
+          {rawMedia}
+        </div>
+      </div>
     </div>
-  )}
-</div>
+  ) : rawMedia;
+
+  const arrows = hasMultiple && (
+    <div className="flex items-center justify-center gap-4 mt-3">
+      <button
+        onClick={() => setCurrentImageIndex((prev) => prev - 1)}
+        disabled={currentImageIndex === 0}
+        className="w-8 h-8 rounded-full border border-violet-500/30 bg-zinc-800/60 flex items-center justify-center text-violet-400 hover:bg-violet-500/20 hover:text-white transition-all disabled:opacity-20 disabled:cursor-default"
+      >
+        &#x25C0;&#xFE0E;
+      </button>
+      <span className="text-xs text-zinc-500 font-mono">
+        {currentImageIndex + 1} / {activeProject.images.length}
+      </span>
+      <button
+        onClick={() => setCurrentImageIndex((prev) => prev + 1)}
+        disabled={currentImageIndex === activeProject.images.length - 1}
+        className="w-8 h-8 rounded-full border border-violet-500/30 bg-zinc-800/60 flex items-center justify-center text-violet-400 hover:bg-violet-500/20 hover:text-white transition-all disabled:opacity-20 disabled:cursor-default"
+      >
+        &#x25B6;&#xFE0E;
+      </button>
+    </div>
+  );
+
+  return activeProject.layout === "portrait" ? (
+    <div className="flex gap-6 items-center">
+      <div className="flex-1 space-y-4 min-w-0">
+        <h2 className="text-xl text-violet-400 font-bold">
+          {activeProject.name}
+        </h2>
+        <p className="text-zinc-400 text-sm whitespace-pre-line">
+          {activeProject.description.trim()}
+        </p>
+        <div className="text-xs text-pink-400 font-mono">
+          stack: {activeProject.stack}
+        </div>
+      </div>
+
+      {activeProject.images?.length > 0 && (
+        <div className="flex flex-col items-center flex-shrink-0">
+          {media}
+          {arrows}
+        </div>
+      )}
+    </div>
+  ) : (
+    <div className="space-y-6">
+      <h2 className="text-xl text-violet-400 font-bold">
+        {activeProject.name}
+      </h2>
+      <p className="text-zinc-400 text-sm">
+        {activeProject.description}
+      </p>
+      <div className="text-xs text-pink-400 font-mono">
+        stack: {activeProject.stack}
+      </div>
+      {activeProject.images?.length > 0 && (
+        <div>
+          {media}
+          {arrows}
+        </div>
+      )}
+    </div>
+  );
+})()}
 
         </TerminalWindow>
       )}
@@ -489,6 +654,8 @@ useEffect(() => {
           className="text-zinc-500 hover:text-violet-400 hover:tracking-wider transition-all duration-200">
           [ /dev/x ]
         </a>
+      </div>
+        </div>
       </div>
     </div>
   );
