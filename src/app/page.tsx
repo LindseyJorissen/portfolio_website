@@ -101,6 +101,7 @@ function TerminalWindow({
   width,
   scale = 1,
   centered = false,
+  bright = false,
   onClose,
 }: {
   title: string;
@@ -111,6 +112,7 @@ function TerminalWindow({
   width: number;
   scale?: number;
   centered?: boolean;
+  bright?: boolean;
   onClose?: () => void;
 }) {
   const [position, setPosition] = useState({
@@ -160,14 +162,7 @@ function TerminalWindow({
         width: width,
         zIndex: zIndex,
       }}
-      className="
-        rounded-xl
-        border border-violet-500/20
-        bg-zinc-900/40
-        backdrop-blur-md
-        shadow-[0_20px_60px_rgba(0,0,0,0.6)]
-        overflow-hidden
-      ">
+      className={`rounded-xl ${bright ? "border border-violet-500/50" : "border border-violet-500/20"} bg-zinc-900/40 backdrop-blur-md shadow-[0_20px_60px_rgba(0,0,0,0.6)] overflow-hidden`}>
       <div
         className="terminal-header flex justify-between items-center cursor-move select-none"
         onMouseDown={(e) => {
@@ -301,9 +296,9 @@ useEffect(() => {
         i++;
       } else {
         clearInterval(interval);
-        setTimeout(() => setBooting(false), 400);
+        setTimeout(() => setBooting(false), 700);
       }
-    }, 200);
+    }, 300);
 
     return () => clearInterval(interval);
   }, []);
@@ -559,6 +554,13 @@ if (!mounted) return null;
             </div>
           </TerminalWindow>
         )}
+      {/*Dim overlay when project is open*/}
+      {activeProject && (
+        <div
+          className="absolute inset-0 bg-black/60 z-90 transition-opacity duration-300"
+          onClick={() => setActiveProject(null)}
+        />
+      )}
       {/*Specific Project window - Active*/}
       {activeProject && (
         <TerminalWindow
@@ -569,6 +571,7 @@ if (!mounted) return null;
           width={viewport.width * 0.65}
           scale={viewport.scale}
           centered
+          bright
           onClose={() => setActiveProject(null)}>
 {(() => {
   const currentSrc = activeProject.images?.[currentImageIndex];
