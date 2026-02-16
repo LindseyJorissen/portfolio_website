@@ -323,7 +323,7 @@ Pookiebase started with a simple thought:
 
 “I want to catalog my book collection, but I don’t want to make another spreadsheet.”
 
-There are plenty of book collection apps available, but every option we tried either included unnecessary features or lacked functionality we actually wanted. There wasn’t a perfect fit — so my fiancé and I decided to build our own.
+There are plenty of book collection apps available, but every option we tried either included unnecessary features or lacked functionality we actually wanted. There just wasn’t a perfect fit, so my fiancé and I decided we should build our own.
 
 Built as a mobile-first Flask application, Pookiebase allows users to scan an ISBN barcode, instantly fetch metadata from the Google Books API, preview the book, and decide whether it belongs in their collection or wishlist.
 
@@ -385,7 +385,7 @@ if (!mounted) return null;
 
       {/* Boot screen overlay */}
       <div
-        className={`absolute inset-0 z-[200] bg-black flex items-center justify-center transition-opacity duration-500 ${
+        className={`absolute inset-0 z-200 bg-black flex items-center justify-center transition-opacity duration-500 ${
           booting ? "opacity-100" : "opacity-0 pointer-events-none"
         }`}
       >
@@ -589,7 +589,7 @@ if (!mounted) return null;
         playsInline
         className={activeProject.layout === "portrait"
           ? "w-full h-full object-cover"
-          : "w-full max-h-[500px] object-contain rounded-lg border border-violet-500/20"
+          : "w-full max-h-500px object-contain rounded-lg border border-violet-500/20"
         }
       />
     ) : (
@@ -598,7 +598,7 @@ if (!mounted) return null;
         alt="Project screenshot"
         className={activeProject.layout === "portrait"
           ? "w-full h-full object-cover"
-          : "w-full max-h-[500px] object-contain rounded-lg border border-violet-500/20"
+          : "w-full max-h-500px object-contain rounded-lg border border-violet-500/20"
         }
       />
     )
@@ -606,13 +606,13 @@ if (!mounted) return null;
 
   // Wrap portrait media in a phone mockup
   const media = activeProject.layout === "portrait" ? (
-    <div className="relative h-[580px] w-[284px]">
+    <div className="relative h-145 w-71">
       {/* Phone bezel */}
       <div className="absolute inset-0 rounded-[2.5rem] border-[3px] border-zinc-600 bg-zinc-900 shadow-[0_0_30px_rgba(139,92,246,0.15)]">
         {/* Notch / dynamic island */}
         <div className="absolute top-2 left-1/2 -translate-x-1/2 w-20 h-5 bg-zinc-900 rounded-full border border-zinc-700 z-10" />
         {/* Screen */}
-        <div className="absolute inset-[3px] rounded-[2.2rem] overflow-hidden bg-black">
+        <div className="absolute inset-0.75 rounded-[2.2rem] overflow-hidden bg-black">
           {rawMedia}
         </div>
       </div>
@@ -656,7 +656,7 @@ if (!mounted) return null;
       </div>
 
       {activeProject.images?.length > 0 && (
-        <div className="flex flex-col items-center flex-shrink-0">
+        <div className="flex flex-col items-center shrink-0">
           {media}
           {arrows}
         </div>
