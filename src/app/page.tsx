@@ -274,12 +274,38 @@ useEffect(() => {
     80,
   );
   const [mounted, setMounted] = useState(false);
+  const [booting, setBooting] = useState(true);
+  const [bootLines, setBootLines] = useState<string[]>([]);
 useEffect(() => {
   setCurrentImageIndex(0);
 }, [activeProject]);
 
   useEffect(() => {
     setMounted(true);
+
+    const lines = [
+      "[OK] Loading kernel modules...",
+      "[OK] Mounting /dev/workspace...",
+      "[OK] Initializing matrix rain...",
+      "[OK] Compiling shaders...",
+      "[OK] Brewing coffee...",
+      "[OK] Establishing uplink...",
+      "[OK] System ready.",
+    ];
+
+    let i = 0;
+    const interval = setInterval(() => {
+      if (i < lines.length) {
+        const line = lines[i];
+        setBootLines((prev) => [...prev, line]);
+        i++;
+      } else {
+        clearInterval(interval);
+        setTimeout(() => setBooting(false), 400);
+      }
+    }, 200);
+
+    return () => clearInterval(interval);
   }, []);
 
   const projects = [
@@ -361,6 +387,31 @@ if (!mounted) return null;
   return (
     <div className="h-screen w-screen overflow-hidden relative bg-black">
       <MatrixRain />
+
+      {/* Boot screen overlay */}
+      <div
+        className={`absolute inset-0 z-[200] bg-black flex items-center justify-center transition-opacity duration-500 ${
+          booting ? "opacity-100" : "opacity-0 pointer-events-none"
+        }`}
+      >
+        <div className="font-mono text-sm max-w-md w-full px-8">
+          {bootLines.map((line, i) => (
+            <div
+              key={i}
+              className={`mb-1 ${
+                line.includes("System ready")
+                  ? "text-violet-400"
+                  : "text-zinc-500"
+              }`}
+            >
+              {line}
+            </div>
+          ))}
+          {booting && (
+            <span className="inline-block w-2 h-4 bg-violet-400 animate-pulse mt-1" />
+          )}
+        </div>
+      </div>
       <div
         className="absolute inset-0 flex items-center justify-center"
       >
