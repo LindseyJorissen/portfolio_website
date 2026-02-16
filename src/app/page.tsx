@@ -304,18 +304,26 @@ useEffect(() => {
   }, []);
 
   const projects = [
-    {
-      title: "Booktomo",
-      description:
-        "Reading analytics platform that visualizes your book data in interactive graphs. Uses NetworkX to generate relationship graphs and suggest new books based on your own reading patterns.",
-      stack: "Django + React",
-      link: "#",
-      layout: "landscape" as const,
-        images: [
-      "/screenshots/booktomo-1.png",
-      "/screenshots/booktomo-2.png",
-    ],
-    },
+{
+  title: "Booktomo",
+  description: `
+Booktomo started as a personal side project inspired by Spotify Wrapped-style yearly recaps. I loved the visual statistics in StoryGraph, but many of the more advanced insights were locked behind a paywall.
+
+The application parses a Goodreads CSV export and transforms raw reading data into fun, personalized graphs. Reading trends, genre breakdowns, and other interactive metrics.
+
+Later, during the Python developer course I was taking, we were assigned an end project: choose a Python package and explore it in depth. I chose NetworkX and decided to expand Booktomo by implementing a graph-based recommendation system. Instead of suggesting books based on what *other* people liked, the system analyzes your own reading history to generate suggestions based on what you’ve read and enjoyed.
+
+Booktomo was my first experience working with React. The project combines a Django backend for data processing and API handling with a React frontend for interactive visualizations.
+  `,
+  stack: "Django · React · Python · NetworkX · JavaScript",
+  link: "#",
+  layout: "landscape" as const,
+  images: [
+    "/screenshots/booktomo-1.png",
+    "/screenshots/booktomo-2.png",
+  ],
+}
+,
  {
   title: "Pookiebase",
   description: `
@@ -353,29 +361,48 @@ The next evolution is transforming Pookiebase into a full Android app with nativ
 }
 ,
     {
-      title: "Spacewise",
-      description:
-        "Property intelligence platform focused on spatial data and smart filtering. Integrates geolocation APIs and structured property datasets to surface meaningful real-estate insights.",
-      stack: "Django",
+  title: "SpaceWise",
+  description: `
+SpaceWise started as our group end project for my Python Developer program, but quickly evolved into something much bigger: a space-ecosystem platform focused on smarter use of underutilized properties.
+
+We live in a time where space is scarce, yet countless buildings sit empty and unused. SpaceWise explores how we can make space work again for people, businesses, and policymakers.
+
+The concept consists of multiple interconnected modules:
+
+We began development with CoAgora as the foundation.
+
+CoAgora is a Django-based web platform hosted on Azure, powered by PostgreSQL. It features authentication, a dashboard architecture, property upload flows, dynamic filtering, and an interactive Leaflet-based map displaying real-time property pins.
+
+The project combines backend architecture, database modeling, geolocation handling, and structured filtering logic. It demonstrates full-stack collaboration within a larger system design.
+  `,
+  stack: "Django · Python · PostgreSQL · Azure · Leaflet · JavaScript",
       link: "#",
       layout: "landscape" as const,
         images: [
-      "/screenshots/spacewise-1.png",
+      "/screenshots/spacewise-1.jpg",
       "/screenshots/spacewise-2.png",
+      "/screenshots/spacewise-3.jpg",
+      "/screenshots/spacewise-4.jpg",
+      "/screenshots/spacewise-5.jpg",
+      "/screenshots/spacewise-6.jpg",
+
     ],
     },
-    {
-      title: "This Portfolio",
-      description:
-        "Cyberpunk terminal-style portfolio with draggable glass windows, custom matrix rain canvas, and a Three.js shaded coffee cup.",
-      stack: "Next.js + Tailwind + Three.js",
-      link: "#",
-      layout: "landscape" as const,
-        images: [
-      "/screenshots/portfolio-1.png",
-      "/screenshots/portfolio-2.png",
-    ],
-    },
+   {
+  title: "This Portfolio",
+  description: `
+This portfolio is less of a traditional website and more of an interactive experiment.
+
+I wanted something fun. Something I could play with and truly enjoy building. Instead of a basic corporate layout, I leaned into geekyness and my love for coffee. A major inspiration came from ricing Arch Linux: customizing every detail, obsessing over aesthetics, and turning a functional environment into something uniquely personal.
+
+It’s a portfolio, yes. But also intentionally artistic. Somewhere between resume, playground, and digital desktop environment.
+
+And yes:  I use Arch, by the way. `,
+  stack: "Next.js · TypeScript · Tailwind · Three.js",
+  link: "#",
+  layout: "landscape" as const,
+}
+,
   ];
 if (!mounted) return null;
 
@@ -589,7 +616,7 @@ if (!mounted) return null;
         playsInline
         className={activeProject.layout === "portrait"
           ? "w-full h-full object-cover"
-          : "w-full max-h-500px object-contain rounded-lg border border-violet-500/20"
+          : "w-full max-h-[400px] object-contain rounded-lg border border-violet-500/20"
         }
       />
     ) : (
@@ -598,7 +625,7 @@ if (!mounted) return null;
         alt="Project screenshot"
         className={activeProject.layout === "portrait"
           ? "w-full h-full object-cover"
-          : "w-full max-h-500px object-contain rounded-lg border border-violet-500/20"
+          : "w-full max-h-[400px] object-contain rounded-lg border border-violet-500/20"
         }
       />
     )
@@ -608,7 +635,7 @@ if (!mounted) return null;
   const media = activeProject.layout === "portrait" ? (
     <div className="relative h-145 w-71">
       {/* Phone bezel */}
-      <div className="absolute inset-0 rounded-[2.5rem] border-[3px] border-zinc-600 bg-zinc-900 shadow-[0_0_30px_rgba(139,92,246,0.15)]">
+      <div className="absolute inset-0 rounded-[2.5rem] border-[3px] border-zinc-600 bg-zinc-900 shadow-[0_0_20px_rgba(139,92,246,0.15)]">
         {/* Notch / dynamic island */}
         <div className="absolute top-2 left-1/2 -translate-x-1/2 w-20 h-5 bg-zinc-900 rounded-full border border-zinc-700 z-10" />
         {/* Screen */}
@@ -674,11 +701,14 @@ if (!mounted) return null;
         stack: {activeProject.stack}
       </div>
       {activeProject.images?.length > 0 && (
-        <div>
-          {media}
-          {arrows}
-        </div>
-      )}
+  <div className="mt-4 flex flex-col items-center">
+    <div className="p-4 bg-zinc-900/50 rounded-2xl border border-violet-500/20 shadow-[0_0_40px_rgba(139,92,246,0.08)]">
+      {media}
+    </div>
+    {arrows}
+  </div>
+)}
+
     </div>
   );
 })()}
