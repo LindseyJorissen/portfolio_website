@@ -193,10 +193,6 @@ function TerminalWindow({
             className="hover:text-violet-400 transition-colors cursor-pointer">
             —
           </span>
-
-          <span className="hover:text-violet-400 transition-colors cursor-pointer">
-            ▢
-          </span>
           <span
             onClick={onClose}
             className="hover:text-red-400 transition-colors cursor-pointer">
@@ -354,6 +350,7 @@ The next evolution is transforming Pookiebase into a full Android app with nativ
       link: "#",
       layout: "portrait" as const,
       images: [
+        "/screenshots/pookiebase-demo.mp4",
         "/screenshots/pookiebase-1.jpeg",
         "/screenshots/pookiebase-2.jpeg",
         "/screenshots/pookiebase-3.jpeg",
