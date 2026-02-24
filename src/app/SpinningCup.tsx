@@ -100,7 +100,7 @@ const materialRef = useRef<THREE.ShaderMaterial | null>(null);
 
 export default function SpinningCup() {
   return (
-    <div style={{ height: "400px", width: "100%" }}>
+    <div style={{ height: "400px", width: "711px", maxWidth: "100%" }}>
       <Canvas
         camera={{ position: [0, 2.1, 4] }}
         gl={{ alpha: true }}

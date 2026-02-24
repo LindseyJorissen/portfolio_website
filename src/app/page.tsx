@@ -132,14 +132,33 @@ function TerminalWindow({
 
   const dragOffset = useRef({ x: 0, y: 0 });
 
+  // Reposition window when viewport changes, as long as it hasn't been manually dragged
+  useEffect(() => {
+    if (!hasBeenDragged) {
+      setPosition({ x: initialX, y: initialY });
+    }
+  }, [initialX, initialY, hasBeenDragged]);
+
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
-      if (!isDragging) return;
+      if (!isDragging || !windowRef.current) return;
 
-      setPosition({
-        x: e.clientX / scale - dragOffset.current.x,
-        y: e.clientY / scale - dragOffset.current.y,
-      });
+      const newX = e.clientX / scale - dragOffset.current.x;
+      const newY = e.clientY / scale - dragOffset.current.y;
+
+      // Clamp to parent container bounds so the window can't leave the frame
+      const parent = windowRef.current.parentElement;
+      if (parent) {
+        const parentW = parent.getBoundingClientRect().width / scale;
+        const parentH = parent.getBoundingClientRect().height / scale;
+        const windowH = windowRef.current.offsetHeight;
+        setPosition({
+          x: Math.max(0, Math.min(newX, parentW - width)),
+          y: Math.max(0, Math.min(newY, parentH - windowH)),
+        });
+      } else {
+        setPosition({ x: newX, y: newY });
+      }
     };
 
     const handleMouseUp = () => {
@@ -153,7 +172,7 @@ function TerminalWindow({
       window.removeEventListener("mousemove", handleMouseMove);
       window.removeEventListener("mouseup", handleMouseUp);
     };
-  }, [isDragging, scale]);
+  }, [isDragging, scale, width]);
 
   const isCentered = centered && !hasBeenDragged;
 
@@ -398,7 +417,7 @@ export default function Portfolio() {
         scale = Math.min(w / MIN_LAYOUT_WIDTH, h / MIN_LAYOUT_HEIGHT);
       } else {
         layoutH = h;
-        layoutW = Math.min(w, Math.round(h * (16 / 9)));
+        layoutW = Math.min(w, Math.round(Math.max(h, 1080) * (16 / 9)));
         scale = 1;
       }
 
@@ -709,7 +728,7 @@ And yes:  I use Arch, by the way. `,
               onMinimize={() =>
                 setMinimizedWindows((prev) => [...prev, "workspace"])
               }>
-              <div className="flex items-center justify-center h-125">
+              <div className="flex items-center justify-center">
                 <SpinningCup />
               </div>
             </TerminalWindow>
