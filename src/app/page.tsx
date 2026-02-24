@@ -66,7 +66,7 @@ function MatrixRain() {
   );
 }
 
-function useTypewriter(text: string, speed: number = 50) {
+function useTypewriter(text: string, speed: number = 50, delay: number = 0) {
   const [displayedText, setDisplayedText] = useState("");
   const [isComplete, setIsComplete] = useState(false);
 
@@ -74,17 +74,23 @@ function useTypewriter(text: string, speed: number = 50) {
     let index = 0;
     setDisplayedText("");
     setIsComplete(false);
-    const timer = setInterval(() => {
-      if (index < text.length) {
-        setDisplayedText(text.slice(0, index + 1));
-        index++;
-      } else {
-        setIsComplete(true);
-        clearInterval(timer);
-      }
-    }, speed);
-    return () => clearInterval(timer);
-  }, [text, speed]);
+    let timer: ReturnType<typeof setInterval>;
+    const startTimeout = setTimeout(() => {
+      timer = setInterval(() => {
+        if (index < text.length) {
+          setDisplayedText(text.slice(0, index + 1));
+          index++;
+        } else {
+          setIsComplete(true);
+          clearInterval(timer);
+        }
+      }, speed);
+    }, delay);
+    return () => {
+      clearTimeout(startTimeout);
+      clearInterval(timer);
+    };
+  }, [text, speed, delay]);
 
   return { displayedText, isComplete };
 }
@@ -267,6 +273,7 @@ export default function Portfolio() {
   const { displayedText, isComplete } = useTypewriter(
     "Fullstack Developer",
     80,
+    3300,
   );
   const [mounted, setMounted] = useState(false);
   const [booting, setBooting] = useState(true);
