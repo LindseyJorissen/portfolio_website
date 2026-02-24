@@ -728,9 +728,7 @@ And yes:  I use Arch, by the way. `,
               onMinimize={() =>
                 setMinimizedWindows((prev) => [...prev, "workspace"])
               }>
-              <div className="flex items-center justify-center">
-                <SpinningCup />
-              </div>
+              <SpinningCup />
             </TerminalWindow>
           )}
 

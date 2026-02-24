@@ -1,7 +1,7 @@
 "use client";
 
-import { Canvas, useFrame } from "@react-three/fiber";
-import { useRef, useMemo } from "react";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
+import { useRef, useMemo, useEffect } from "react";
 import * as THREE from "three";
 import { useGLTF, Center } from "@react-three/drei";
 
@@ -61,6 +61,14 @@ function AsciiMaterial() {
 
   return material;
 }
+function CameraSetup() {
+  const { camera } = useThree();
+  useEffect(() => {
+    camera.lookAt(0, 0, 0);
+  }, [camera]);
+  return null;
+}
+
 function CupModel() {
   const meshRef = useRef<THREE.Group>(null);
 const materialRef = useRef<THREE.ShaderMaterial | null>(null);
@@ -100,14 +108,14 @@ const materialRef = useRef<THREE.ShaderMaterial | null>(null);
 
 export default function SpinningCup() {
   return (
-    <div style={{ height: "400px", width: "711px", maxWidth: "100%" }}>
+    <div style={{ height: "500px", width: "100%", position: "relative" }}>
       <Canvas
         camera={{ position: [0, 2.1, 4] }}
         gl={{ alpha: true }}
       >
+        <CameraSetup />
         <ambientLight intensity={2} />
         <directionalLight intensity={2} position={[5, 5, 5]} />
-        
         <CupModel />
       </Canvas>
     </div>
