@@ -8,7 +8,6 @@ const GitHubCalendar = dynamic(
   () => import("react-github-calendar").then((mod) => mod.GitHubCalendar),
   { ssr: false },
 );
-
 function MatrixRain() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -209,6 +208,122 @@ function TerminalWindow({
   );
 }
 
+function MobileTerminalCard({
+  title,
+  children,
+}: {
+  title: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="rounded-xl border border-violet-500/20 bg-zinc-900/40 backdrop-blur-md overflow-hidden">
+      <div className="terminal-header">
+        <span className="text-sm text-zinc-400 font-mono">{title}</span>
+      </div>
+      <div className="p-4">{children}</div>
+    </div>
+  );
+}
+
+
+function MobileProjectModal({
+  project,
+  onClose,
+  currentImageIndex,
+  setCurrentImageIndex,
+}: {
+  project: {
+    name: string;
+    description: string;
+    stack: string;
+    images: string[];
+    layout: "landscape" | "portrait";
+  };
+  onClose: () => void;
+  currentImageIndex: number;
+  setCurrentImageIndex: React.Dispatch<React.SetStateAction<number>>;
+}) {
+  const currentSrc = project.images?.[currentImageIndex];
+  const isVideo = currentSrc?.match(/\.(mp4|webm|mov)$/i);
+  const hasMultiple = project.images?.length > 1;
+
+  return (
+    <div className="fixed inset-0 z-50 bg-zinc-950/98 overflow-y-auto">
+      <div className="sticky top-0 bg-zinc-900/95 backdrop-blur-md border-b border-violet-500/20 px-4 py-3 flex justify-between items-center z-10">
+        <span className="text-xs text-zinc-400 font-mono truncate pr-4">
+          ~/projects/{project.name.toLowerCase().replace(/\s+/g, "-")}
+        </span>
+        <button
+          onClick={onClose}
+          className="text-zinc-500 hover:text-red-400 transition-colors shrink-0 text-lg leading-none">
+          ✕
+        </button>
+      </div>
+
+      <div className="p-4 space-y-5">
+        <h2 className="text-xl text-violet-400 font-bold">{project.name}</h2>
+
+        <p className="text-zinc-400 text-sm whitespace-pre-line leading-relaxed">
+          {project.description.trim()}
+        </p>
+
+        <div className="text-xs text-pink-400 font-mono">
+          stack: {project.stack}
+        </div>
+
+        {project.images?.length > 0 && currentSrc && (
+          <div className="space-y-3">
+            <div className="rounded-lg overflow-hidden border border-violet-500/20">
+              {isVideo ? (
+                <video
+                  key={currentSrc}
+                  src={currentSrc}
+                  autoPlay
+                  loop
+                  muted
+                  playsInline
+                  className="w-full object-contain"
+                />
+              ) : (
+                <img
+                  src={currentSrc}
+                  alt="Project screenshot"
+                  className="w-full object-contain"
+                />
+              )}
+            </div>
+            {hasMultiple && (
+              <div className="flex items-center justify-center gap-4">
+                <button
+                  onClick={() => setCurrentImageIndex((prev) => prev - 1)}
+                  disabled={currentImageIndex === 0}
+                  className="w-9 h-9 rounded-full border border-violet-500/30 bg-zinc-800/60 flex items-center justify-center text-violet-400 hover:bg-violet-500/20 transition-all disabled:opacity-20">
+                  &#x25C0;&#xFE0E;
+                </button>
+                <span className="text-xs text-zinc-500 font-mono">
+                  {currentImageIndex + 1} / {project.images.length}
+                </span>
+                <button
+                  onClick={() => setCurrentImageIndex((prev) => prev + 1)}
+                  disabled={currentImageIndex === project.images.length - 1}
+                  className="w-9 h-9 rounded-full border border-violet-500/30 bg-zinc-800/60 flex items-center justify-center text-violet-400 hover:bg-violet-500/20 transition-all disabled:opacity-20">
+                  &#x25B6;&#xFE0E;
+                </button>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+
+const calendarTheme = {
+  light: ["#1a1a2e", "#3b1e6d", "#5b2bb5", "#7a33ff", "#b266ff"],
+  dark: ["#1a1a2e", "#3b1e6d", "#5b2bb5", "#7a33ff", "#b266ff"],
+};
+
 export default function Portfolio() {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
@@ -227,10 +342,10 @@ export default function Portfolio() {
   });
   const [minimizedWindows, setMinimizedWindows] = useState<string[]>([]);
 
-  // Below these thresholds, content scales down to fit
   const MIN_LAYOUT_WIDTH = 1200;
   const MIN_LAYOUT_HEIGHT = 700;
 
+  const [isMobile, setIsMobile] = useState(false);
   const [viewport, setViewport] = useState({
     width: 0,
     height: 0,
@@ -241,22 +356,21 @@ export default function Portfolio() {
     const updateSize = () => {
       const w = window.innerWidth;
       const h = window.innerHeight;
-      const isUltrawide = w / h > 2;
 
+      setIsMobile(w < 768);
+
+      const isUltrawide = w / h > 2;
       let layoutW: number, layoutH: number, scale: number;
 
       if (isUltrawide) {
-        // Ultrawide: constrain content to a 16:9 area, centered
         layoutW = Math.round(h * (16 / 9));
         layoutH = h;
         scale = 1;
       } else if (w < MIN_LAYOUT_WIDTH || h < MIN_LAYOUT_HEIGHT) {
-        // Small screen: lay out at minimum size, then scale to fit
         layoutW = MIN_LAYOUT_WIDTH;
         layoutH = MIN_LAYOUT_HEIGHT;
         scale = Math.min(w / MIN_LAYOUT_WIDTH, h / MIN_LAYOUT_HEIGHT);
       } else {
-        // Normal screen: use actual dimensions, no scaling
         layoutW = w;
         layoutH = h;
         scale = 1;
@@ -278,6 +392,7 @@ export default function Portfolio() {
   const [mounted, setMounted] = useState(false);
   const [booting, setBooting] = useState(true);
   const [bootLines, setBootLines] = useState<string[]>([]);
+
   useEffect(() => {
     setCurrentImageIndex(0);
   }, [activeProject]);
@@ -318,7 +433,7 @@ Booktomo started as a personal side project inspired by Spotify Wrapped-style ye
 
 The application parses a Goodreads CSV export and transforms raw reading data into fun, personalized graphs. Reading trends, genre breakdowns, and other interactive metrics.
 
-Later, during the Python developer course I was taking, we were assigned an end project: choose a Python package and explore it in depth. I chose NetworkX and decided to expand Booktomo by implementing a graph-based recommendation system. Instead of suggesting books based on what *other* people liked, the system analyzes your own reading history to generate suggestions based on what you’ve read and enjoyed.
+Later, during the Python developer course I was taking, we were assigned an end project: choose a Python package and explore it in depth. I chose NetworkX and decided to expand Booktomo by implementing a graph-based recommendation system. Instead of suggesting books based on what *other* people liked, the system analyzes your own reading history to generate suggestions based on what you've read and enjoyed.
 
 Booktomo was my first experience working with React. The project combines a Django backend for data processing and API handling with a React frontend for interactive visualizations.
   `,
@@ -332,17 +447,17 @@ Booktomo was my first experience working with React. The project combines a Djan
       description: `
 Pookiebase started with a simple thought:
 
-“I want to catalog my book collection, but I don’t want to make another spreadsheet.”
+"I want to catalog my book collection, but I don't want to make another spreadsheet."
 
-There are plenty of book collection apps available, but every option we tried either included unnecessary features or lacked functionality we actually wanted. There just wasn’t a perfect fit, so my fiancé and I decided we should build our own.
+There are plenty of book collection apps available, but every option we tried either included unnecessary features or lacked functionality we actually wanted. There just wasn't a perfect fit, so my fiancé and I decided we should build our own.
 
 Built as a mobile-first Flask application, Pookiebase allows users to scan an ISBN barcode, instantly fetch metadata from the Google Books API, preview the book, and decide whether it belongs in their collection or wishlist.
 
 The collection can be:
-• Searched  
-• Filtered  
-• Grouped by author or genre  
-• Enriched with purchase price data  
+• Searched
+• Filtered
+• Grouped by author or genre
+• Enriched with purchase price data
 
 A future feature may include looking up market prices to estimate the overall value of the collection.
 
@@ -396,7 +511,7 @@ This portfolio is less of a traditional website and more of an interactive exper
 
 I wanted something fun. Something I could play with and truly enjoy building. Instead of a basic corporate layout, I leaned into geekyness and my love for coffee. A major inspiration came from ricing Arch Linux: customizing every detail, obsessing over aesthetics, and turning a functional environment into something uniquely personal.
 
-It’s a portfolio, yes. But also intentionally artistic. Somewhere between resume, playground, and digital desktop environment.
+It's a portfolio, yes. But also intentionally artistic. Somewhere between resume, playground, and digital desktop environment.
 
 And yes:  I use Arch, by the way. `,
       stack: "Next.js · TypeScript · Tailwind · Three.js",
@@ -404,34 +519,144 @@ And yes:  I use Arch, by the way. `,
       layout: "landscape" as const,
     },
   ];
+
   if (!mounted) return null;
+
+
+  const bootScreen = (
+    <div
+      className={`fixed inset-0 z-200 bg-black flex items-center justify-center transition-opacity duration-500 ${
+        booting ? "opacity-100" : "opacity-0 pointer-events-none"
+      }`}>
+      <div className="font-mono text-sm max-w-md w-full px-8">
+        {bootLines.map((line, i) => (
+          <div
+            key={i}
+            className={`mb-1 ${
+              line.includes("System ready") ? "text-violet-400" : "text-zinc-500"
+            }`}>
+            {line}
+          </div>
+        ))}
+        {booting && (
+          <span className="inline-block w-2 h-4 bg-violet-400 animate-pulse mt-1" />
+        )}
+      </div>
+    </div>
+  );
+
+
+  if (isMobile) {
+    return (
+      <div className="min-h-screen w-screen relative bg-black">
+        <MatrixRain />
+        {bootScreen}
+
+        {activeProject && (
+          <MobileProjectModal
+            project={activeProject}
+            onClose={() => setActiveProject(null)}
+            currentImageIndex={currentImageIndex}
+            setCurrentImageIndex={setCurrentImageIndex}
+          />
+        )}
+
+        <div className="relative z-10 px-4 pt-6 pb-10 space-y-4 max-w-lg mx-auto">
+
+          <MobileTerminalCard title="~/about">
+            <p className="text-zinc-400 text-sm mb-2">
+              <span className="text-violet-400">user@dev</span>:~$ whoami
+            </p>
+            <h1 className="text-2xl font-bold neon-name mb-2">
+              Lindsey Jorissen
+            </h1>
+            <div className="flex items-center gap-2 text-lg text-violet-200 mb-4">
+              <span className="text-zinc-500">&gt;</span>
+              <span>{displayedText}</span>
+              {!isComplete && (
+                <span className="cursor-blink text-violet-400">|</span>
+              )}
+            </div>
+            <p className="text-zinc-400 text-sm">
+              I build systems that live on the internet. Usually when I want
+              something no one has made before.
+            </p>
+          </MobileTerminalCard>
+
+          <MobileTerminalCard title="~/projects">
+            <p className="text-zinc-400 text-sm mb-4">
+              <span className="text-violet-400">user@dev</span>:~/projects$ ls
+            </p>
+            <div className="space-y-1 font-mono text-sm">
+              {projects.map((project) => (
+                <div
+                  key={project.title}
+                  className="text-violet-400 font-mono text-sm cursor-pointer hover:text-pink-400 active:text-pink-400 transition-colors py-1.5"
+                  onClick={() =>
+                    setActiveProject({
+                      name: project.title,
+                      description: project.description,
+                      stack: project.stack,
+                      images: project.images ?? [],
+                      layout: project.layout,
+                    })
+                  }>
+                  drwxr-xr-x {project.title.toLowerCase().replace(/\s/g, "-")}
+                </div>
+              ))}
+            </div>
+          </MobileTerminalCard>
+
+          <MobileTerminalCard title="~/system">
+            <p className="text-zinc-400 text-sm mb-4">
+              <span className="text-violet-400">user@dev</span>:~$ system-status
+            </p>
+            <div className="space-y-3 text-sm mb-6">
+              <div className="flex justify-between">
+                <span className="text-zinc-400">LOCATION</span>
+                <span className="text-violet-300">Belgium</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-zinc-400">COFFEE LEVEL</span>
+                <span className="text-violet-400">████████░░</span>
+              </div>
+            </div>
+            <GitHubCalendar
+              username="lindseyjorissen"
+              blockSize={6}
+              blockMargin={2}
+              fontSize={9}
+              theme={calendarTheme}
+            />
+          </MobileTerminalCard>
+
+          <div className="flex gap-6 justify-center pt-2 font-mono text-sm">
+            <a
+              href="https://github.com/lindseyjorissen"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-zinc-500 hover:text-violet-400 transition-colors">
+              [ /dev/github ]
+            </a>
+            <a
+              href="https://www.linkedin.com/in/lindseyjorissen/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-zinc-500 hover:text-violet-400 transition-colors">
+              [ /dev/linkedin ]
+            </a>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
 
   return (
     <div className="h-screen w-screen overflow-hidden relative bg-black">
       <MatrixRain />
+      {bootScreen}
 
-      {/* Boot screen overlay */}
-      <div
-        className={`absolute inset-0 z-200 bg-black flex items-center justify-center transition-opacity duration-500 ${
-          booting ? "opacity-100" : "opacity-0 pointer-events-none"
-        }`}>
-        <div className="font-mono text-sm max-w-md w-full px-8">
-          {bootLines.map((line, i) => (
-            <div
-              key={i}
-              className={`mb-1 ${
-                line.includes("System ready")
-                  ? "text-violet-400"
-                  : "text-zinc-500"
-              }`}>
-              {line}
-            </div>
-          ))}
-          {booting && (
-            <span className="inline-block w-2 h-4 bg-violet-400 animate-pulse mt-1" />
-          )}
-        </div>
-      </div>
       <div className="absolute inset-0 flex items-center justify-center">
         <div
           style={{
@@ -441,7 +666,6 @@ And yes:  I use Arch, by the way. `,
             transformOrigin: "center center",
           }}
           className="relative">
-          {/* Workspace Window (Coffee)*/}
           {openWindows.workspace && !minimizedWindows.includes("workspace") && (
             <TerminalWindow
               title="~/workspace"
@@ -461,7 +685,7 @@ And yes:  I use Arch, by the way. `,
               </div>
             </TerminalWindow>
           )}
-          {/* About Window */}
+
           {openWindows.about && !minimizedWindows.includes("about") && (
             <TerminalWindow
               title="~/about"
@@ -498,7 +722,7 @@ And yes:  I use Arch, by the way. `,
               </p>
             </TerminalWindow>
           )}
-          {/* Projects Window */}
+
           {openWindows.projects && !minimizedWindows.includes("projects") && (
             <TerminalWindow
               title="~/projects"
@@ -537,7 +761,7 @@ And yes:  I use Arch, by the way. `,
               </div>
             </TerminalWindow>
           )}
-          {/* System Window */}
+
           {openWindows.system && !minimizedWindows.includes("system") && (
             <TerminalWindow
               title="~/system"
@@ -575,34 +799,19 @@ And yes:  I use Arch, by the way. `,
                   blockSize={8}
                   blockMargin={3}
                   fontSize={10}
-                  theme={{
-                    light: [
-                      "#1a1a2e",
-                      "#3b1e6d",
-                      "#5b2bb5",
-                      "#7a33ff",
-                      "#b266ff",
-                    ],
-                    dark: [
-                      "#1a1a2e",
-                      "#3b1e6d",
-                      "#5b2bb5",
-                      "#7a33ff",
-                      "#b266ff",
-                    ],
-                  }}
+                  theme={calendarTheme}
                 />
               </div>
             </TerminalWindow>
           )}
-          {/*Dim overlay when project is open*/}
+
           {activeProject && (
             <div
               className="absolute inset-0 bg-black/60 z-90 transition-opacity duration-300"
               onClick={() => setActiveProject(null)}
             />
           )}
-          {/*Specific Project window - Active*/}
+
           {activeProject && (
             <TerminalWindow
               title={`~/projects/${activeProject.name.toLowerCase().replace(/\s+/g, "-")}`}
@@ -647,15 +856,11 @@ And yes:  I use Arch, by the way. `,
                     />
                   ));
 
-                // Wrap portrait media in a phone mockup
                 const media =
                   activeProject.layout === "portrait" ? (
                     <div className="relative h-145 w-71">
-                      {/* Phone bezel */}
                       <div className="absolute inset-0 rounded-[2.5rem] border-[3px] border-zinc-600 bg-zinc-900 shadow-[0_0_20px_rgba(139,92,246,0.15)]">
-                        {/* Notch / dynamic island */}
                         <div className="absolute top-2 left-1/2 -translate-x-1/2 w-20 h-5 bg-zinc-900 rounded-full border border-zinc-700 z-10" />
-                        {/* Screen */}
                         <div className="absolute inset-0.75 rounded-[2.2rem] overflow-hidden bg-black">
                           {rawMedia}
                         </div>
@@ -732,7 +937,7 @@ And yes:  I use Arch, by the way. `,
               })()}
             </TerminalWindow>
           )}
-          {/* Taskbar */}
+
           <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-3 px-4 py-2 bg-zinc-900/60 backdrop-blur-md border border-violet-500/20 rounded-2xl shadow-[0_0_20px_rgba(139,92,246,0.1)] z-200">
             {minimizedWindows.map((id) => (
               <button
@@ -746,7 +951,6 @@ And yes:  I use Arch, by the way. `,
             ))}
           </div>
 
-          {/* Social Links */}
           <div className="absolute bottom-8 right-5 w-45 flex flex-col gap-2 text-sm font-mono">
             <a
               href="https://github.com/lindseyjorissen"
@@ -763,7 +967,6 @@ And yes:  I use Arch, by the way. `,
               className="text-zinc-500 hover:text-violet-400 hover:tracking-wider transition-all duration-200">
               [ /dev/linkedin ]
             </a>
-
           </div>
         </div>
       </div>
