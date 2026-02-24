@@ -336,7 +336,7 @@ function MobileHint({ onDismiss }: { onDismiss: () => void }) {
             <span className="text-violet-400">{">"}</span> Hey there!
           </p>
           <p className="text-zinc-400 text-sm leading-relaxed">
-            This website is <span className="text-violet-300">a lot cooler on desktop</span>. It&apos;s a fully interactive windowed environment — definitely worth checking out on your computer or tablet!
+            This website is <span className="text-violet-300">a lot cooler on desktop</span>. It&apos;s a fully interactive windowed environment, definitely worth checking out on your computer or tablet!
           </p>
           <div className="pt-2">
             <button
