@@ -324,8 +324,36 @@ const calendarTheme = {
   dark: ["#1a1a2e", "#3b1e6d", "#5b2bb5", "#7a33ff", "#b266ff"],
 };
 
+function MobileHint({ onDismiss }: { onDismiss: () => void }) {
+  return (
+    <div className="fixed inset-0 z-300 bg-black/80 backdrop-blur-sm flex items-center justify-center px-6">
+      <div className="w-full max-w-sm rounded-xl border border-violet-500/40 bg-zinc-900/95 shadow-[0_0_40px_rgba(139,92,246,0.2)] overflow-hidden">
+        <div className="terminal-header">
+          <span className="text-sm text-zinc-400 font-mono">~/notice</span>
+        </div>
+        <div className="p-6 space-y-4">
+          <p className="text-zinc-300 text-sm font-mono leading-relaxed">
+            <span className="text-violet-400">{">"}</span> Hey there!
+          </p>
+          <p className="text-zinc-400 text-sm leading-relaxed">
+            This website is <span className="text-violet-300">a lot cooler on desktop</span>. It&apos;s a fully interactive windowed environment — definitely worth checking out on your computer or tablet!
+          </p>
+          <div className="pt-2">
+            <button
+              onClick={onDismiss}
+              className="w-full px-4 py-2.5 text-sm font-mono text-zinc-500 hover:text-zinc-300 transition-colors">
+              continue on mobile anyway →
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function Portfolio() {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [mobileHintDismissed, setMobileHintDismissed] = useState(false);
 
   const [activeProject, setActiveProject] = useState<null | {
     name: string;
@@ -551,6 +579,9 @@ And yes:  I use Arch, by the way. `,
       <div className="min-h-screen w-screen relative bg-black">
         <MatrixRain />
         {bootScreen}
+        {!mobileHintDismissed && !booting && (
+          <MobileHint onDismiss={() => setMobileHintDismissed(true)} />
+        )}
 
         {activeProject && (
           <MobileProjectModal
