@@ -1,7 +1,7 @@
 services:
   portfolio:
     build: .
-    container_name: portfolio
+    container_name: portfolio_lindsey
     restart: unless-stopped
     ports:
       - "3000:3000"
