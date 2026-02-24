@@ -104,6 +104,7 @@ function TerminalWindow({
   scale = 1,
   centered = false,
   bright = false,
+  maxHeight,
   onClose,
   onMinimize,
 }: {
@@ -116,6 +117,7 @@ function TerminalWindow({
   scale?: number;
   centered?: boolean;
   bright?: boolean;
+  maxHeight?: number;
   onClose?: () => void;
   onMinimize?: () => void;
 }) {
@@ -165,6 +167,7 @@ function TerminalWindow({
           : { left: position.x, top: position.y }),
         width: width,
         zIndex: zIndex,
+        ...(maxHeight ? { maxHeight, display: "flex", flexDirection: "column" } : {}),
       }}
       className={`rounded-xl ${bright ? "border border-violet-500/50" : "border border-violet-500/20"} bg-zinc-900/40 backdrop-blur-md shadow-[0_20px_60px_rgba(0,0,0,0.6)] overflow-hidden`}>
       <div
@@ -203,7 +206,7 @@ function TerminalWindow({
         </div>
       </div>
 
-      <div className="p-4 sm:p-6">{children}</div>
+      <div className={`p-4 sm:p-6${maxHeight ? " overflow-y-auto flex-1" : ""}`}>{children}</div>
     </div>
   );
 }
@@ -387,20 +390,15 @@ export default function Portfolio() {
 
       setIsMobile(w < 768);
 
-      const isUltrawide = w / h > 2;
       let layoutW: number, layoutH: number, scale: number;
 
-      if (isUltrawide) {
-        layoutW = Math.round(h * (16 / 9));
-        layoutH = h;
-        scale = 1;
-      } else if (w < MIN_LAYOUT_WIDTH || h < MIN_LAYOUT_HEIGHT) {
+      if (w < MIN_LAYOUT_WIDTH || h < MIN_LAYOUT_HEIGHT) {
         layoutW = MIN_LAYOUT_WIDTH;
         layoutH = MIN_LAYOUT_HEIGHT;
         scale = Math.min(w / MIN_LAYOUT_WIDTH, h / MIN_LAYOUT_HEIGHT);
       } else {
-        layoutW = w;
         layoutH = h;
+        layoutW = Math.min(w, Math.round(h * (16 / 9)));
         scale = 1;
       }
 
@@ -797,7 +795,7 @@ And yes:  I use Arch, by the way. `,
             <TerminalWindow
               title="~/system"
               initialX={viewport.width * 0.05}
-              initialY={viewport.height * 0.59}
+              initialY={viewport.height * 0.50}
               zIndex={25}
               width={viewport.width * 0.43}
               scale={viewport.scale}
@@ -853,6 +851,7 @@ And yes:  I use Arch, by the way. `,
               scale={viewport.scale}
               centered
               bright
+              maxHeight={viewport.height * 0.92}
               onClose={() => setActiveProject(null)}>
               {(() => {
                 const currentSrc = activeProject.images?.[currentImageIndex];
@@ -969,18 +968,20 @@ And yes:  I use Arch, by the way. `,
             </TerminalWindow>
           )}
 
-          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-3 px-4 py-2 bg-zinc-900/60 backdrop-blur-md border border-violet-500/20 rounded-2xl shadow-[0_0_20px_rgba(139,92,246,0.1)] z-200">
-            {minimizedWindows.map((id) => (
-              <button
-                key={id}
-                onClick={() =>
-                  setMinimizedWindows((prev) => prev.filter((w) => w !== id))
-                }
-                className="px-4 py-1.5 text-xs font-mono text-violet-300 bg-zinc-800/70 border border-violet-500/30 rounded-xl hover:bg-violet-500/20 hover:text-white hover:shadow-[0_0_15px_rgba(139,92,246,0.4)] transition-all duration-200">
-                {id.charAt(0).toUpperCase() + id.slice(1)}
-              </button>
-            ))}
-          </div>
+          {minimizedWindows.length > 0 && (
+            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-3 px-4 py-2 bg-zinc-900/60 backdrop-blur-md border border-violet-500/20 rounded-2xl shadow-[0_0_20px_rgba(139,92,246,0.1)] z-200">
+              {minimizedWindows.map((id) => (
+                <button
+                  key={id}
+                  onClick={() =>
+                    setMinimizedWindows((prev) => prev.filter((w) => w !== id))
+                  }
+                  className="px-4 py-1.5 text-xs font-mono text-violet-300 bg-zinc-800/70 border border-violet-500/30 rounded-xl hover:bg-violet-500/20 hover:text-white hover:shadow-[0_0_15px_rgba(139,92,246,0.4)] transition-all duration-200">
+                  {id.charAt(0).toUpperCase() + id.slice(1)}
+                </button>
+              ))}
+            </div>
+          )}
 
           <div className="absolute bottom-8 right-5 w-45 flex flex-col gap-2 text-sm font-mono">
             <a
