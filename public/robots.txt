@@ -1,0 +1,6 @@
+# Allow all search engines to index the site
+User-agent: *
+Allow: /
+
+# Sitemap location (update after deploying)
+# Sitemap: https://yourdomain.com/sitemap.xml

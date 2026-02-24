@@ -32,34 +32,27 @@ function AsciiMaterial() {
         varying vec3 vNormal;
         varying vec2 vUv;
         
-        // ASCII character patterns (simplified - just using brightness levels)
         const float chars = 8.0;
         
         void main() {
-          // Simple lighting
           vec3 lightDir = normalize(vec3(0.5, 1.0, 0.5));
           float light = dot(vNormal, lightDir);
           light = max(0.2, light); // Keep minimum brightness
           
-          // Add rim lighting effect
           vec3 viewDir = vec3(0.0, 0.0, 1.0);
           float rim = 1.0 - abs(dot(vNormal, viewDir));
           rim = pow(rim, 2.0) * 0.5;
           
           float brightness = light + rim;
           
-          // Create ASCII-like banding by quantizing brightness
           float asciiLevels = 9.0;
           brightness = floor(brightness * asciiLevels) / asciiLevels;
           
-          // Add subtle pixelation effect
           vec2 uv = vUv;
           uv = floor(uv * pixelSize) / pixelSize;
           
-          // Create subtle scanline effect
           float scanline = sin(uv.y * 100.0 + time * 5.0) * 0.1 + 0.9;
           
-          // Output with ASCII-inspired styling
           gl_FragColor = vec4(color * brightness * scanline, 1.0);
         }
       `

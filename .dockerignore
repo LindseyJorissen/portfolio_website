@@ -1,0 +1,11 @@
+.git
+.gitignore
+.next
+node_modules
+Dockerfile
+.dockerignore
+README.md
+*.pem
+.env*
+.vercel
+coverage

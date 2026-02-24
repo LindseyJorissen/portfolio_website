@@ -9,7 +9,6 @@ const GitHubCalendar = dynamic(
   { ssr: false },
 );
 
-// Matrix Rain Background Component
 function MatrixRain() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -67,7 +66,6 @@ function MatrixRain() {
   );
 }
 
-// Terminal typing effect
 function useTypewriter(text: string, speed: number = 50) {
   const [displayedText, setDisplayedText] = useState("");
   const [isComplete, setIsComplete] = useState(false);
@@ -91,7 +89,6 @@ function useTypewriter(text: string, speed: number = 50) {
   return { displayedText, isComplete };
 }
 
-// Terminal window
 function TerminalWindow({
   title,
   children,
@@ -523,7 +520,7 @@ And yes:  I use Arch, by the way. `,
                         name: project.title,
                         description: project.description,
                         stack: project.stack,
-                        images: project.images,
+                        images: project.images ?? [],
                         layout: project.layout,
                       })
                     }>
@@ -628,7 +625,7 @@ And yes:  I use Arch, by the way. `,
                       className={
                         activeProject.layout === "portrait"
                           ? "w-full h-full object-cover"
-                          : "w-full max-h-[400px] object-contain rounded-lg border border-violet-500/20"
+                          : "w-full max-h-100 object-contain rounded-lg border border-violet-500/20"
                       }
                     />
                   ) : (
@@ -638,7 +635,7 @@ And yes:  I use Arch, by the way. `,
                       className={
                         activeProject.layout === "portrait"
                           ? "w-full h-full object-cover"
-                          : "w-full max-h-[400px] object-contain rounded-lg border border-violet-500/20"
+                          : "w-full max-h-100 object-contain rounded-lg border border-violet-500/20"
                       }
                     />
                   ));
@@ -747,6 +744,7 @@ And yes:  I use Arch, by the way. `,
             <a
               href="https://github.com/lindseyjorissen"
               target="_blank"
+              rel="noopener noreferrer"
               className="text-zinc-500 hover:text-violet-400 hover:tracking-wider transition-all duration-200">
               [ /dev/github ]
             </a>
@@ -754,16 +752,11 @@ And yes:  I use Arch, by the way. `,
             <a
               href="https://www.linkedin.com/in/lindseyjorissen/"
               target="_blank"
+              rel="noopener noreferrer"
               className="text-zinc-500 hover:text-violet-400 hover:tracking-wider transition-all duration-200">
               [ /dev/linkedin ]
             </a>
 
-            <a
-              href="https://twitter.com"
-              target="_blank"
-              className="text-zinc-500 hover:text-violet-400 hover:tracking-wider transition-all duration-200">
-              [ /dev/x ]
-            </a>
           </div>
         </div>
       </div>
